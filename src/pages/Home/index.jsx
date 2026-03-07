@@ -195,7 +195,7 @@ export function Home() {
                                     <button type="button" class="btn" onClick={() => handleUnitChange(-1)}>-</button>
                                     <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{formData.units}</span>
                                     <button type="button" class="btn" onClick={() => handleUnitChange(1)}>+</button>
-                                    <span style={{ marginLeft: 'auto', fontWeight: 'bold' }}>R$ {(formData.units * 1).toFixed(2)}</span>
+                                    <span style={{ marginLeft: 'auto', fontWeight: 'bold' }}>R$ {(formData.units * 5).toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -412,9 +412,9 @@ export function Home() {
                                             <>
                                                 <p><strong>1. Regras gerais do sorteio</strong></p>
                                                 <p>1.1 Para concorrer ao sorteio o sr(a). deverá fazer a adesão de pelo menos um bilhete.</p>
-                                                <p>1.2 Cada bilhete tem o preço de R$ 1,00 e lhe conferirá o direito de concorrer ao sorteio.</p>
+                                                <p>1.2 Cada bilhete tem o preço de R$ 5,00 e lhe conferirá o direito de concorrer ao sorteio.</p>
                                                 <p>1.3 Você pode comprar quantos bilhetes quiser, aumentando suas chances de ganhar.</p>
-                                                <p>1.4 O sorteio não possui data fixa. O sorteio será realizado assim que a meta mínima de 2.000 (dois mil) bilhetes vendidos for alcançada.</p>
+                                                <p>1.4 O sorteio não possui data fixa. O sorteio será realizado assim que a meta mínima de 1.000 (mil) bilhetes vendidos for alcançada.</p>
 
                                                 <p><strong>2. Do pagamento</strong></p>
                                                 <p>2.1 O pagamento deverá ser feito via PIX após o envio do formulário.</p>

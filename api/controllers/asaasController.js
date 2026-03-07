@@ -22,7 +22,9 @@ console.log('endpoint: ', CUS_ENDPOINT);
             const errorText = await customerResponse.text();
             console.error('Asaas Customer Error Status:', customerResponse.status);
             console.error('Asaas Customer Error Body:', errorText);
-            throw new Error(`Asaas Customer Creation Failed (${customerResponse.status})`);
+            const err = new Error(`Asaas Customer Creation Failed (${customerResponse.status}): ${errorText}`);
+            err.status = customerResponse.status;
+            throw err;
         }
 
         const customer = await customerResponse.json();
@@ -39,8 +41,7 @@ console.log('endpoint: ', CUS_ENDPOINT);
                 customer: customer.id,
                 billingType: 'PIX',
                 value: amount,
-                dueDate: dueDate.toISOString().split('T')[0],
-                cpfCnpj: cpf // Added CPF/CNPJ here
+                dueDate: dueDate.toISOString().split('T')[0]
             })
         });
 
@@ -48,7 +49,9 @@ console.log('endpoint: ', CUS_ENDPOINT);
             const errorText = await paymentResponse.text();
             console.error('Asaas Payment Error Status:', paymentResponse.status);
             console.error('Asaas Payment Error Body:', errorText);
-            throw new Error(`Asaas Payment Creation Failed (${paymentResponse.status})`);
+            const err = new Error(`Asaas Payment Creation Failed (${paymentResponse.status}): ${errorText}`);
+            err.status = paymentResponse.status;
+            throw err;
         }
 
         const payment = await paymentResponse.json();
@@ -63,7 +66,9 @@ console.log('endpoint: ', CUS_ENDPOINT);
             const errorText = await qrResponse.text();
             console.error('Asaas QR Error Status:', qrResponse.status);
             console.error('Asaas QR Error Body:', errorText);
-            throw new Error(`Asaas QR Code Generation Failed (${qrResponse.status})`);
+            const err = new Error(`Asaas QR Code Generation Failed (${qrResponse.status}): ${errorText}`);
+            err.status = qrResponse.status;
+            throw err;
         }
 
         const qrData = await qrResponse.json();
@@ -75,13 +80,16 @@ console.log('endpoint: ', CUS_ENDPOINT);
         });
 
         res.json({
-            success: qrData.success,
+            success: true,
             payload: qrData.payload,
             qrcode: qrData.encodedImage
         });
     } catch (error) {
         console.error('Asaas error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(error.status || 500).json({ 
+            success: false,
+            error: error.message 
+        });
     }
 };
 

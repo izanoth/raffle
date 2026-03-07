@@ -8,7 +8,7 @@ export const register = async (req, res) => {
     if (!cpf) return res.status(400).json({ error: 'CPF/CNPJ required.' });
 
     try {
-        const amount = parseFloat(units) * 1;
+        const amount = parseFloat(units) * 5;
         const tickets = await generateTickets(parseInt(units));
         
         const client = await prisma.client.create({
