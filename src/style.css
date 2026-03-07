@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap');
+
+:root {
+  --win-gray: #c0c0c0;
+  --win-white: #ffffff;
+  --win-shadow: #808080;
+  --win-dark-shadow: #404040;
+  --win-blue: #000080;
+  --win-bg: #008080; /* Classic Teal background */
+  --win-text: #000000;
+}
+
+body {
+  background-color: var(--win-bg);
+  color: var(--win-text);
+  font-family: 'Tahoma', 'Arial', sans-serif;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Window Style */
+.window {
+  background-color: var(--win-gray);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
+  box-shadow: 1px 1px 0 0 var(--win-shadow) inset;
+  padding: 2px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.title-bar {
+  background: linear-gradient(90deg, var(--win-blue), #1084d0);
+  padding: 3px 5px 3px 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 18px;
+}
+
+.title-bar-text {
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.title-bar-controls button {
+  width: 16px;
+  height: 14px;
+  background-color: var(--win-gray);
+  border: 1px solid;
+  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
+  font-size: 9px;
+  padding: 0;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.window-body {
+  padding: 15px;
+}
+
+/* UI Elements */
+.fieldset {
+  border: 2px solid;
+  border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+  padding: 15px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.fieldset-label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  background: var(--win-gray);
+  padding: 0 5px;
+  font-size: 11px;
+}
+
+.form-control {
+  border: 2px solid;
+  border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+  background-color: var(--win-white);
+  padding: 4px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.btn {
+  background-color: var(--win-gray);
+  border: 2px solid;
+  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
+  padding: 5px 15px;
+  cursor: pointer;
+  font-size: 12px;
+  outline: none;
+}
+
+.btn:active {
+  border-color: var(--win-dark-shadow) var(--win-white) var(--win-white) var(--win-dark-shadow);
+  padding: 6px 14px 4px 16px;
+}
+
+.btn:disabled {
+  color: var(--win-shadow);
+  cursor: not-allowed;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  background: #fff;
+  border: 2px solid var(--win-shadow);
+  padding: 10px;
+}
+
+.ticket-item {
+  border: 1px dashed #000;
+  text-align: center;
+  padding: 2px;
+  font-family: monospace;
+}
+
+/* Desktop Taskbar simulation */
+.inner {
+  padding-top: 30px;
+  color: #ffffff;
+}
+
+.tokbg {
+  background-image: url('/img/maskbg2.png');
+  background-repeat: repeat;
+  color: white;
+  width: 320px;
+  margin: auto;
+  text-align: center;
+}
+
+.tokbg img {
+  mix-tokbg-mode: lighten;
+}
+
+p.mask {
+  background: url('/img/mask.png') 0 0 / cover repeat;
+  color: #de466c;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--win-gray);
+  border-top: 2px solid var(--win-white);
+  display: flex;
+  align-items: center;
+  padding: 2px 5px;
+  z-index: 1000;
+}
+
+.start-btn {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

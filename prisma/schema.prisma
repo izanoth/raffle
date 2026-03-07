@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String
+  cpf       String   // CPF/CNPJ obrigatório
+  stripe_id String?
+  asaas_id  String?
+  tickets   String
+  units     Int      @default(1)
+  amount    Float
+  paid      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Raffle {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("raffle")
+}
+
+model Session {
+  id           String   @id
+  user_id      Int?
+  ip_address   String?
+  user_agent   String?
+  payload      String
+  last_activity Int
+
+  @@map("sessions")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
