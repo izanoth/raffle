@@ -59,9 +59,7 @@ app.get('/api/admin/clients', async (req, res) => {
 // Export for Vercel
 export default app;
 
-// Listen locally
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    app.listen(port, () => {
-        console.log(`Server running on http://localhost:${port}`);
-    });
-}
+// Listen for local testing
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});

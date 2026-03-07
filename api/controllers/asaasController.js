@@ -2,9 +2,13 @@ import prisma from '../db.js';
 import fetch from 'node-fetch';
 
 const ASAAS_KEY = process.env.ASAAS_KEY;
-const CUS_ENDPOINT = process.env.ASAAS_CUS_ENDPOINT || 'https://sandbox.asaas.com/api/v3/customers';
-const PAY_ENDPOINT = process.env.ASAAS_PAY_ENDPOINT || 'https://sandbox.asaas.com/api/v3/payments';
-const QR_ENDPOINT = process.env.ASAAS_QR_ENDPOINT || 'https://sandbox.asaas.com/api/v3/payments/{id}/pixQrCode';
+
+// Forced to Production environment as requested
+const BASE_URL = 'https://www.asaas.com/api/v3';
+
+const CUS_ENDPOINT = process.env.ASAAS_CUS_ENDPOINT || `${BASE_URL}/customers`;
+const PAY_ENDPOINT = process.env.ASAAS_PAY_ENDPOINT || `${BASE_URL}/payments`;
+const QR_ENDPOINT = process.env.ASAAS_QR_ENDPOINT || `${BASE_URL}/payments/{id}/pixQrCode`;
 
 export const asyncAsaas = async (req, res) => {
     const { client_id, name, cpf, phone, amount } = req.body;
