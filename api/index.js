@@ -56,6 +56,58 @@ app.get('/api/admin/clients', async (req, res) => {
     res.json(clients);
 });
 
+app.post('/api/admin/clients/:id/confirm-payment', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await prisma.client.update({
+            where: { id: parseInt(id) },
+            data: { paid: 1 }
+        });
+        res.json({ success: true, client });
+    } catch (error) {
+        console.error('Error confirming payment:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/admin/draw', async (req, res) => {
+    try {
+        const paidClients = await prisma.client.findMany({
+            where: { paid: 1 }
+        });
+
+        if (paidClients.length === 0) {
+            return res.status(400).json({ error: 'Nenhum pagamento confirmado para realizar o sorteio.' });
+        }
+
+        // Collect all tickets from paid clients
+        let allTickets = [];
+        paidClients.forEach(client => {
+            try {
+                const tickets = JSON.parse(client.tickets);
+                tickets.forEach(ticket => {
+                    allTickets.push({ ticket, clientId: client.id, name: client.name, email: client.email, phone: client.phone });
+                });
+            } catch (e) {
+                console.error('Error parsing tickets for client', client.id);
+            }
+        });
+
+        if (allTickets.length === 0) {
+            return res.status(400).json({ error: 'Nenhum bilhete válido encontrado.' });
+        }
+
+        // Pick a random ticket
+        const winnerIndex = Math.floor(Math.random() * allTickets.length);
+        const winner = allTickets[winnerIndex];
+
+        res.json({ success: true, winner });
+    } catch (error) {
+        console.error('Error during draw:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Export for Vercel
 export default app;
 

@@ -49,6 +49,13 @@ export function Checkout() {
         }
     };
 
+    const handlePayInPerson = () => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('payInPerson', 'true');
+        }
+        route('/success');
+    };
+
     const startPolling = () => {
         const interval = setInterval(async () => {
             try {
@@ -85,7 +92,7 @@ export function Checkout() {
                     <p style={{ margin: '0', fontSize: '12px', color: 'darkblue' }}>Valor Devido: R$ {client.amount.toFixed(2)}</p>
                 </div>
 
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <div style={{ textAlign: 'center', marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                     <p style={{ fontSize: '11px' }}>Selecione o método de pagamento para concluir:</p>
                     <button 
                         class="btn" 
@@ -94,6 +101,13 @@ export function Checkout() {
                         style={{ width: '200px', height: '40px', fontWeight: 'bold' }}
                     >
                         {loading ? 'Processando...' : 'Pagar via PIX'}
+                    </button>
+                    <button 
+                        class="btn" 
+                        onClick={handlePayInPerson}
+                        style={{ width: '200px', height: '40px' }}
+                    >
+                        Pagar Pessoalmente
                     </button>
                 </div>
 

@@ -6,10 +6,14 @@ export function Success() {
     const { route } = useLocation();
     const [client, setClient] = useState(null);
     const [bilhetes, setBilhetes] = useState([]);
+    const [payInPerson, setPayInPerson] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedClient = sessionStorage.getItem('new-client');
+            const inPerson = sessionStorage.getItem('payInPerson') === 'true';
+            setPayInPerson(inPerson);
+            
             if (!storedClient) {
                 route('/');
                 return;
@@ -46,6 +50,11 @@ export function Success() {
                 <div class="fieldset">
                     <span class="fieldset-label">Confirmação de Transação</span>
                     <p style={{ margin: '0', fontSize: '11px' }}>Tire um print como comprovante. Obrigado!</p>
+                    {payInPerson && (
+                        <p style={{ margin: '10px 0 0 0', fontSize: '11px', color: '#cc3000', fontWeight: 'bold' }}>
+                            Nota: Como você optou por pagar pessoalmente, lembre-se de que os bilhetes porderão ser cancelados. Agradeço a sua compreensão!
+                        </p>
+                    )}
                 </div>
 
                 <div class="inner tokbg" style={{ paddingBottom: '10px', textAlign: 'center', marginBottom: '10px', borderRadius: '30px', color: 'white' }}>
@@ -71,7 +80,10 @@ export function Success() {
 
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <small style={{ fontSize: '11px', color: 'black' }}>Dúvidas só entrar em contato </small>
-                    <button class="btn" style={{ width: '100%', marginTop: '10px' }} onClick={() => route('/')}>Concluir</button>
+                    <button class="btn" style={{ width: '100%', marginTop: '10px' }} onClick={() => {
+                        if (typeof window !== 'undefined') sessionStorage.removeItem('payInPerson');
+                        route('/');
+                    }}>Concluir</button>
                 </div>
             </div>
 
