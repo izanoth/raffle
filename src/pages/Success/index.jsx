@@ -36,7 +36,7 @@ export function Success() {
     const todayDate = new Date().toLocaleDateString('pt-BR');
 
     return (
-        <div class="window success" style={{ marginTop: '20px' }}>
+        <div class="window success">
             <div class="title-bar">
                 <div class="title-bar-text">Sucesso - Rifa do Ivan</div>
                 <div class="title-bar-controls">

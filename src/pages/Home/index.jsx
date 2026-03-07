@@ -3,6 +3,20 @@ import { useLocation } from 'preact-iso';
 import { validateCpf } from '../../helpers/utils';
 import '@styles';
 
+function SystemTimer() {
+    const [timer, setTimer] = useState('00:00:00');
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            setTimer(now.toLocaleTimeString());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return <span>{timer}</span>;
+}
+
 export function Home() {
     const { route } = useLocation();
     const [formData, setFormData] = useState({
@@ -13,21 +27,12 @@ export function Home() {
         units: 1,
         terms: false
     });
-    const [timer, setTimer] = useState('00:00:00');
     const [errors, setErrors] = useState({});
     const [modal, setModal] = useState('intro'); // 'intro', 'contract', 'rules', null
     const [activeWindow, setActiveWindow] = useState('form'); // 'form', 'status'
     const [showStartMenu, setShowStartMenu] = useState(false);
     const [raffleStatus, setRaffleStatus] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const now = new Date();
-            setTimer(now.toLocaleTimeString());
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
 
     const fetchStatus = async () => {
         setLoadingStatus(true);
@@ -119,7 +124,7 @@ export function Home() {
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>          
             {/* Form Window */}
             {activeWindow === 'form' && (
-                <div class="window" style={{ marginTop: '20px' }}>
+                <div class="window">
                     <div class="title-bar">
                         <div class="title-bar-text">Rifa do Ivan - Participar</div>
                         <div class="title-bar-controls">
@@ -132,7 +137,7 @@ export function Home() {
                     <div class="window-body">
                         <div class="fieldset">
                             <span class="fieldset-label">Status do Sistema</span>
-                            <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // Hora: {timer}</p>
+                            <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // Hora: <SystemTimer /></p>
                             <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: 50% do Valor Arrecadado</p>
                             <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>
                                 <a href="#" onClick={openRules} style={{ color: 'blue', textDecoration: 'underline' }}>Leia as regras do sorteio</a>
@@ -149,6 +154,8 @@ export function Home() {
                                     value={formData.name}
                                     onInput={handleChange}
                                     placeholder={errors.name || ""}
+                                    autoComplete="name"
+                                    required
                                 />
                             </div>
 
@@ -161,6 +168,8 @@ export function Home() {
                                     value={formData.email}
                                     onInput={handleChange}
                                     placeholder={errors.email || ""}
+                                    autoComplete="email"
+                                    required
                                 />
                             </div>
 
@@ -168,11 +177,14 @@ export function Home() {
                                 <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>WhatsApp/Celular:</label>
                                 <input
                                     class="form-control"
-                                    type="text"
+                                    type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onInput={handleChange}
                                     placeholder={errors.phone || ""}
+                                    autoComplete="tel"
+                                    inputMode="tel"
+                                    required
                                 />
                             </div>
 
@@ -185,6 +197,8 @@ export function Home() {
                                     value={formData.cpf}
                                     onInput={handleChange}
                                     placeholder={errors.cpf || ""}
+                                    inputMode="numeric"
+                                    required
                                 />
                                 {errors.cpf && <p style={{ color: 'red', fontSize: '10px', margin: '2px 0 0 0', position: 'absolute' }}>{errors.cpf}</p>}
                             </div>
@@ -225,7 +239,7 @@ export function Home() {
 
             {/* Status Window */}
             {activeWindow === 'status' && (
-                <div class="window" style={{ marginTop: '20px' }}>
+                <div class="window">
                     <div class="title-bar">
                         <div class="title-bar-text">Status da Rifa do Ivan</div>
                         <div class="title-bar-controls">
@@ -344,7 +358,7 @@ export function Home() {
                     Rifa do Ivan
                 </div>
                 <div style={{ border: '2px inset', backgroundColor: 'var(--win-gray)', padding: '0 5px', fontSize: '11px' }}>
-                    {timer}
+                    <SystemTimer />
                 </div>
             </div>
 

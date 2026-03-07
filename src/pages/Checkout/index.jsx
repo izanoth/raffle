@@ -74,7 +74,7 @@ export function Checkout() {
     if (!client) return <div class="window"><div class="window-body">Carregando dados do usuário...</div></div>;
 
     return (
-        <div class="window" style={{ marginTop: '20px' }}>
+        <div class="window">
             <div class="title-bar">
                 <div class="title-bar-text">Pagamento - Rifa do Ivan</div>
                 <div class="title-bar-controls">
