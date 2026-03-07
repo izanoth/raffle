@@ -5,7 +5,7 @@ import '@styles';
 export function Success() {
     const { route } = useLocation();
     const [client, setClient] = useState(null);
-    const [tickets, setTickets] = useState([]);
+    const [bilhetes, setBilhetes] = useState([]);
 
     useEffect(() => {
         const storedClient = sessionStorage.getItem('new-client');
@@ -18,9 +18,9 @@ export function Success() {
         
         if (clientData.tickets) {
            try {
-               setTickets(JSON.parse(clientData.tickets));
+               setBilhetes(JSON.parse(clientData.tickets));
            } catch(e) {
-               setTickets([]);
+               setBilhetes([]);
            }
         }
     }, []);
@@ -32,7 +32,7 @@ export function Success() {
     return (
         <div class="window success" style={{ marginTop: '20px' }}>
             <div class="title-bar">
-                <div class="title-bar-text">Sucesso - Rifa Estudantil</div>
+                <div class="title-bar-text">Sucesso - Rifa do Ivan</div>
                 <div class="title-bar-controls">
                     <button aria-label="Minimize">_</button>
                     <button aria-label="Maximize">口</button>
@@ -56,7 +56,7 @@ export function Success() {
                             <tr>
                                 <td colspan="2" style={{ padding: '10px', fontSize: '12px' }}>Sorteio: 000000001</td>
                             </tr>
-                            {tickets.map((item) => (
+                            {bilhetes.map((item) => (
                                 <tr key={item}>
                                     <td colspan="2" style={{ textAlign: 'center', fontSize: '32px', textShadow: '1px 1px 2px dark' }}>
                                         <p class="mask">{item}</p>
@@ -74,7 +74,9 @@ export function Success() {
             </div>
 
             <div class="taskbar">
-                <button class="btn start-btn">田 Iniciar</button>
+                <div style={{marginLeft: 'auto', padding: '0 5px', border: '2px inset', backgroundColor: 'var(--win-gray)', fontSize: '11px', marginRight: '5px'}}>
+                    Rifa do Ivan
+                </div>
             </div>
         </div>
     );

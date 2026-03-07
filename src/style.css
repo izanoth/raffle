@@ -1,17 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap');
 
 :root {
-  --win-gray: #c0c0c0;
+  --win-gray: #ece9d8; /* XP Cream */
   --win-white: #ffffff;
-  --win-shadow: #808080;
-  --win-dark-shadow: #404040;
-  --win-blue: #000080;
-  --win-bg: #008080; /* Classic Teal background */
+  --win-shadow: #707070;
+  --win-blue: #0055e5; /* XP Blue */
+  --win-bg: #245edb; /* XP Taskbar Blue */
+  --xp-orange: #ff8e00;
+  --xp-red: #cc3000;
   --win-text: #000000;
 }
 
 body {
-  background-color: var(--win-bg);
+  background: #3a6ea5 url('https://wallpapercave.com/wp/wp2590209.jpg') no-repeat center center fixed;
+  background-size: cover;
   color: var(--win-text);
   font-family: 'Tahoma', 'Arial', sans-serif;
   margin: 0;
@@ -23,70 +25,92 @@ body {
 /* Window Style */
 .window {
   background-color: var(--win-gray);
-  border: 2px solid;
-  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
-  box-shadow: 1px 1px 0 0 var(--win-shadow) inset;
-  padding: 2px;
+  border: 3px solid var(--win-blue);
+  border-radius: 8px 8px 0 0;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  padding: 0;
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .title-bar {
-  background: linear-gradient(90deg, var(--win-blue), #1084d0);
-  padding: 3px 5px 3px 3px;
+  background: linear-gradient(180deg, #0058e6 0%, #3a91ff 10%, #2a81ef 30%, #1c6ce3 50%, #155bd3 70%, #0849bd 100%);
+  padding: 3px 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 18px;
+  height: 25px;
+  border-bottom: 1px solid #003b9b;
 }
 
 .title-bar-text {
   color: white;
   font-weight: bold;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.5px;
+  text-shadow: 1px 1px 1px #003b9b;
+}
+
+.title-bar-controls {
+    display: flex;
+    gap: 2px;
 }
 
 .title-bar-controls button {
-  width: 16px;
-  height: 14px;
-  background-color: var(--win-gray);
-  border: 1px solid;
-  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
-  font-size: 9px;
+  width: 21px;
+  height: 21px;
+  background-color: #3d95ff;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  font-size: 10px;
   padding: 0;
   font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
+  box-shadow: inset -1px -1px 1px rgba(0,0,0,0.2);
+}
+
+.title-bar-controls button[aria-label="Close"] {
+    background-color: #e81123;
+    background: linear-gradient(180deg, #f24537 0%, #c72c2c 100%);
+}
+
+.title-bar-controls button:hover {
+    filter: brightness(1.1);
 }
 
 .window-body {
   padding: 15px;
+  background-color: #f5f5f5;
 }
 
 /* UI Elements */
 .fieldset {
-  border: 2px solid;
-  border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+  border: 1px solid #919b9c;
+  border-radius: 5px;
   padding: 15px;
   margin-bottom: 15px;
   position: relative;
+  background: #fff;
 }
 
 .fieldset-label {
   position: absolute;
   top: -10px;
   left: 10px;
-  background: var(--win-gray);
+  background: #f5f5f5;
   padding: 0 5px;
   font-size: 11px;
+  color: #003b9b;
+  font-weight: bold;
 }
 
 .form-control {
-  border: 2px solid;
-  border-color: var(--win-shadow) var(--win-white) var(--win-white) var(--win-shadow);
+  border: 1px solid #7f9db9;
   background-color: var(--win-white);
   padding: 4px;
   font-size: 13px;
@@ -96,45 +120,113 @@ body {
 }
 
 .btn {
-  background-color: var(--win-gray);
-  border: 2px solid;
-  border-color: var(--win-white) var(--win-dark-shadow) var(--win-dark-shadow) var(--win-white);
+  background: linear-gradient(180deg, #ffffff 0%, #ece9d8 100%);
+  border: 1px solid #003b9b;
+  border-radius: 3px;
   padding: 5px 15px;
   cursor: pointer;
   font-size: 12px;
   outline: none;
+  color: #000;
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    background: linear-gradient(180deg, #fff 0%, #ff8e00 100%);
 }
 
 .btn:active {
-  border-color: var(--win-dark-shadow) var(--win-white) var(--win-white) var(--win-dark-shadow);
-  padding: 6px 14px 4px 16px;
+  background: #dcd8c0;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 .btn:disabled {
-  color: var(--win-shadow);
+  color: #aca899;
+  border-color: #aca899;
+  background: #f5f5f5;
   cursor: not-allowed;
 }
 
-.ticket-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  background: #fff;
-  border: 2px solid var(--win-shadow);
-  padding: 10px;
-}
-
-.ticket-item {
-  border: 1px dashed #000;
-  text-align: center;
-  padding: 2px;
-  font-family: monospace;
+/* Special Button Style for Primary actions */
+button[type="submit"].btn {
+    border-color: #388e3c;
+    font-weight: bold;
 }
 
 /* Desktop Taskbar simulation */
-.inner {
-  padding-top: 30px;
-  color: #ffffff;
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #245edb 0%, #3f8cf3 9%, #245edb 18%, #245edb 92%, #1941a5 100%);
+  border-top: 1px solid #1c6ce3;
+  display: flex;
+  align-items: center;
+  padding: 2px 10px;
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+}
+
+.start-btn-xp {
+    background: linear-gradient(180deg, #388e3c 0%, #4caf50 10%, #388e3c 90%, #1b5e20 100%);
+    border: none;
+    border-radius: 0 10px 10px 0;
+    color: white;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 14px;
+    height: 100%;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+}
+
+.start-btn-xp:hover {
+    filter: brightness(1.2);
+}
+
+.start-menu {
+    position: fixed;
+    bottom: 30px;
+    left: 0;
+    width: 250px;
+    background: #fff;
+    border: 2px solid #245edb;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    box-shadow: 2px -2px 10px rgba(0,0,0,0.3);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.start-menu-header {
+    background: linear-gradient(90deg, #1e5799 0%, #2989d8 50%, #207cca 100%);
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.start-menu-item {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+}
+
+.start-menu-item:hover {
+    background-color: #316ac5;
+    color: white;
 }
 
 .tokbg {
@@ -146,10 +238,6 @@ body {
   text-align: center;
 }
 
-.tokbg img {
-  mix-tokbg-mode: lighten;
-}
-
 p.mask {
   background: url('/img/mask.png') 0 0 / cover repeat;
   color: #de466c;
@@ -158,23 +246,6 @@ p.mask {
   margin: 0;
 }
 
-.taskbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 28px;
-  background: var(--win-gray);
-  border-top: 2px solid var(--win-white);
-  display: flex;
-  align-items: center;
-  padding: 2px 5px;
-  z-index: 1000;
-}
-
-.start-btn {
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.mb-3-with-error {
+    margin-bottom: 25px;
 }

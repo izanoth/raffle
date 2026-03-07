@@ -22,6 +22,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 // Main Routes
 app.post('/api/register', mainController.register);
 app.get('/api/timer', mainController.getTimer);
+app.get('/api/raffle/status', mainController.getRaffleStatus);
 
 // Asaas/PIX Routes
 app.post('/api/asaas', asaasController.asyncAsaas);

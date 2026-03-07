@@ -67,7 +67,7 @@ export function Checkout() {
     return (
         <div class="window" style={{ marginTop: '20px' }}>
             <div class="title-bar">
-                <div class="title-bar-text">Pagamento - Rifa Estudantil</div>
+                <div class="title-bar-text">Pagamento - Rifa do Ivan</div>
                 <div class="title-bar-controls">
                     <button aria-label="Minimize">_</button>
                     <button aria-label="Maximize">口</button>
@@ -120,7 +120,9 @@ export function Checkout() {
             </div>
             
             <div class="taskbar">
-                <button class="btn start-btn">田 Iniciar</button>
+                <div style={{marginLeft: 'auto', padding: '0 5px', border: '2px inset', backgroundColor: 'var(--win-gray)', fontSize: '11px', marginRight: '5px'}}>
+                    Rifa do Ivan
+                </div>
             </div>
         </div>
     );
