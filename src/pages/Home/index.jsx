@@ -103,7 +103,9 @@ export function Home() {
             const client = await response.json();
 
             if (response.ok) {
-                sessionStorage.setItem('new-client', JSON.stringify(client));
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('new-client', JSON.stringify(client));
+                }
                 route('/checkout');
             } else {
                 setErrors({ submit: client.error || 'Registration failed' });

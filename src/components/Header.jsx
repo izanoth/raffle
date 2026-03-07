@@ -2,10 +2,12 @@ import { useLocation } from 'preact-iso';
 
 export function Header() {
     const { url, route } = useLocation();
-    const isAdmin = sessionStorage.getItem('admin');
+    const isAdmin = typeof window !== 'undefined' ? sessionStorage.getItem('admin') : null;
 
     const handleLogout = () => {
-        sessionStorage.removeItem('admin');
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('admin');
+        }
         route('/admin');
     };
 

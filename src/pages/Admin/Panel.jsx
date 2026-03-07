@@ -11,7 +11,7 @@ export function Panel() {
     });
 
     useEffect(() => {
-        if (!sessionStorage.getItem('admin')) {
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('admin')) {
             route('/admin');
             return;
         }
@@ -29,7 +29,9 @@ export function Panel() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('admin');
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('admin');
+        }
         route('/admin');
     };
 

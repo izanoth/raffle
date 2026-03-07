@@ -17,7 +17,9 @@ export function Login() {
             });
             const data = await response.json();
             if (response.ok) {
-                sessionStorage.setItem('admin', data.user);
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('admin', data.user);
+                }
                 route('/admin/panel');
             } else {
                 setError(true);

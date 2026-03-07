@@ -8,20 +8,22 @@ export function Success() {
     const [bilhetes, setBilhetes] = useState([]);
 
     useEffect(() => {
-        const storedClient = sessionStorage.getItem('new-client');
-        if (!storedClient) {
-            route('/');
-            return;
-        }
-        const clientData = JSON.parse(storedClient);
-        setClient(clientData);
-        
-        if (clientData.tickets) {
-           try {
-               setBilhetes(JSON.parse(clientData.tickets));
-           } catch(e) {
-               setBilhetes([]);
-           }
+        if (typeof window !== 'undefined') {
+            const storedClient = sessionStorage.getItem('new-client');
+            if (!storedClient) {
+                route('/');
+                return;
+            }
+            const clientData = JSON.parse(storedClient);
+            setClient(clientData);
+            
+            if (clientData.tickets) {
+               try {
+                   setBilhetes(JSON.parse(clientData.tickets));
+               } catch(e) {
+                   setBilhetes([]);
+               }
+            }
         }
     }, []);
 

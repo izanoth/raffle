@@ -7,7 +7,7 @@ export function Hasher() {
     const [hash, setHash] = useState('');
 
     useEffect(() => {
-        if (!sessionStorage.getItem('admin')) {
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('admin')) {
             route('/admin');
         }
     }, []);

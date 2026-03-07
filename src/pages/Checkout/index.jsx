@@ -10,12 +10,14 @@ export function Checkout() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const storedClient = sessionStorage.getItem('new-client');
-        if (!storedClient) {
-            route('/');
-            return;
+        if (typeof window !== 'undefined') {
+            const storedClient = sessionStorage.getItem('new-client');
+            if (!storedClient) {
+                route('/');
+                return;
+            }
+            setClient(JSON.parse(storedClient));
         }
-        setClient(JSON.parse(storedClient));
     }, []);
 
     const handlePixPayment = async () => {

@@ -59,6 +59,8 @@ app.get('/api/admin/clients', async (req, res) => {
 export default app;
 
 // Listen locally
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+}

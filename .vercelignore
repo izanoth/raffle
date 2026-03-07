@@ -1,0 +1,9 @@
+to_migrate
+.env*
+dev.db
+prisma/migrations
+*.php
+.git
+node_modules
+dist
+.gemini

@@ -6,7 +6,7 @@ export function List() {
     const [clients, setClients] = useState([]);
 
     useEffect(() => {
-        if (!sessionStorage.getItem('admin')) {
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('admin')) {
             route('/admin');
             return;
         }
@@ -24,7 +24,9 @@ export function List() {
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem('admin');
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('admin');
+        }
         route('/admin');
     };
 
