@@ -133,7 +133,7 @@ export function Home() {
                         <div class="fieldset">
                             <span class="fieldset-label">Status do Sistema</span>
                             <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // Hora: {timer}</p>
-                            <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: Alexa Echo Dot 5ª Geração</p>
+                            <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: 50% do Valor Arrecadado</p>
                             <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>
                                 <a href="#" onClick={openRules} style={{ color: 'blue', textDecoration: 'underline' }}>Leia as regras do sorteio</a>
                             </p>
@@ -423,8 +423,8 @@ export function Home() {
                                                 <p>3.1 Uma vez o pagamento efetuado, o sr(a). receberá o comprovante da sua participação, contendo os números com os quais concorrerá.</p>
 
                                                 <p><strong>4. Do prêmio</strong></p>
-                                                <p>4.1 O vencedor será contactado por meio do número de telefone para confirmar o método de recebimento.</p>
-                                                <p>4.2 Caso se faça necessário, o prêmio poderá ser enviado por Sedex, sem custos para o vencedor.</p>
+                                                <p>4.1 O prêmio será correspondente a 50% (cinquenta por cento) do valor total arrecadado com a venda dos bilhetes.</p>
+                                                <p>4.2 O vencedor será contactado por meio do número de telefone para confirmar a transferência do prêmio via PIX.</p>
                                             </>
                                         )}
                                         
