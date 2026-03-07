@@ -116,8 +116,7 @@ export function Home() {
     };
 
     return (
-        <div style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
+        <div style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '20px' }}>          
             {/* Form Window */}
             {activeWindow === 'form' && (
                 <div class="window" style={{ marginTop: '20px' }}>

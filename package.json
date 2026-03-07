@@ -1,6 +1,7 @@
 {
 	"private": true,
 	"type": "module",
+	"description": "Quero comprar uma bicicleta e por isso fiz essa rifa. Sou estudante de Farmácia e este projeto me ajuda a arrecadar fundos para meus estudos e mobilidade.",
 	"scripts": {
 		"dev": "vite",
 		"server": "nodemon api/index.js",
