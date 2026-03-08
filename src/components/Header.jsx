@@ -13,7 +13,7 @@ export function Header() {
 
     if (isAdmin) {
        return (
-            <div class="window" style={{ marginBottom: '10px' }}>
+            <div class="window no-print" style={{ marginBottom: '10px' }}>
                 <div class="title-bar">
                     <div class="title-bar-text">Menu Administrativo</div>
                 </div>

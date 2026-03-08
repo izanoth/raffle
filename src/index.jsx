@@ -8,6 +8,7 @@ import { Login } from './pages/Admin/Login.jsx';
 import { Panel } from './pages/Admin/Panel.jsx';
 import { Hasher } from './pages/Admin/Hasher.jsx';
 import { List } from './pages/Admin/List.jsx';
+import { SuccessPreview } from './pages/Admin/SuccessPreview.jsx';
 import { NotFound } from './pages/_404.jsx';
 import '@styles';
 
@@ -24,6 +25,7 @@ export function App() {
 					<Route path="/admin/panel" component={Panel} />
 					<Route path="/admin/hasher" component={Hasher} />
 					<Route path="/admin/list" component={List} />
+					<Route path="/admin/success-preview" component={SuccessPreview} />
 					<Route default component={NotFound} />
 				</Router>
 			</main>

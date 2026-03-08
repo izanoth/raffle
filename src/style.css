@@ -271,3 +271,68 @@ p.mask {
 .mb-3-with-error {
     margin-bottom: 25px;
 }
+
+/* Print Styles */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  .no-print, 
+  .title-bar-controls,
+  .taskbar,
+  .btn,
+  .start-btn-xp,
+  .start-menu {
+    display: none !important;
+  }
+
+  .window {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  .window-body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .tokbg {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background-image: url('/img/maskbg2.png') !important;
+    border-radius: 20px !important;
+    width: 100% !important;
+    max-width: 400px;
+    margin: 20px auto !important;
+  }
+
+  p.mask {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: url('/img/mask.png') 0 0 / cover repeat !important;
+    -webkit-background-clip: text !important;
+    color: #de466c !important; /* Fallback color */
+  }
+
+  .fieldset {
+    border: 1px solid #ccc !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+.no-print {
+  display: block;
+}

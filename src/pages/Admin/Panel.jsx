@@ -167,6 +167,7 @@ export function Panel() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
                     <button class="btn" onClick={() => route('/admin/list')} style={{ minWidth: '120px' }}>Lista de Clientes</button>
                     <button class="btn" onClick={() => route('/admin/hasher')} style={{ minWidth: '120px' }}>Gerador de Hash</button>
+                    <button class="btn" onClick={() => route('/admin/success-preview')} style={{ minWidth: '120px' }}>Gerar Comprovante</button>
                     <button 
                         class="btn" 
                         onClick={handleDraw} 

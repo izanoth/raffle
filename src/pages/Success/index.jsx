@@ -33,11 +33,28 @@ export function Success() {
 
     if (!client) return <div class="window"><div class="window-body">Dados do sistema indisponíveis.</div></div>;
 
+    const handlePrint = () => {
+        const originalTitle = document.title;
+        // Format: ddmmaa
+        const date = new Date();
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = String(date.getFullYear()).slice(-2);
+        const dateStr = `${d}${m}${y}`;
+        
+        // Using a default order number or one from client if available
+        const orderId = (client.id || '001').toString().padStart(3, '0');
+        
+        document.title = `rifa-do-ivan_pedido-no${orderId}_${dateStr}`;
+        window.print();
+        document.title = originalTitle;
+    };
+
     const todayDate = new Date().toLocaleDateString('pt-BR');
 
     return (
         <div class="window success">
-            <div class="title-bar">
+            <div class="title-bar no-print">
                 <div class="title-bar-text">Sucesso - Rifa do Ivan</div>
                 <div class="title-bar-controls">
                     <button aria-label="Minimize">_</button>
@@ -47,15 +64,13 @@ export function Success() {
             </div>
 
             <div class="window-body">
-                <div class="fieldset">
-                    <span class="fieldset-label">Confirmação de Transação</span>
-                    <p style={{ margin: '0', fontSize: '11px' }}>Tire um print como comprovante. Obrigado!</p>
-                    {payInPerson && (
-                        <p style={{ margin: '10px 0 0 0', fontSize: '11px', color: '#cc3000', fontWeight: 'bold' }}>
+                {payInPerson && (
+                    <div class="fieldset" style={{ border: '1px solid #cc3000', marginBottom: '10px' }}>
+                        <p style={{ margin: '0', fontSize: '11px', color: '#cc3000', fontWeight: 'bold' }}>
                             Nota: Como você optou por pagar pessoalmente, lembre-se de que os bilhetes porderão ser cancelados. Agradeço a sua compreensão!
                         </p>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 <div class="inner tokbg" style={{ paddingBottom: '10px', textAlign: 'center', marginBottom: '10px', borderRadius: '30px', color: 'white' }}>
                     <table style={{ color: '#000', fontWeight: '900', width: '100%', position: 'relative', textAlign: 'center' }}>
@@ -78,8 +93,9 @@ export function Success() {
                     </table>
                 </div>
 
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <div style={{ marginTop: '20px', textAlign: 'center' }} class="no-print">
                     <small style={{ fontSize: '11px', color: 'black' }}>Dúvidas só entrar em contato </small>
+                    <button class="btn" style={{ width: '100%', marginTop: '10px' }} onClick={handlePrint}>Imprimir / PDF</button>
                     <button class="btn" style={{ width: '100%', marginTop: '10px' }} onClick={() => {
                         if (typeof window !== 'undefined') sessionStorage.removeItem('payInPerson');
                         route('/');
@@ -87,7 +103,7 @@ export function Success() {
                 </div>
             </div>
 
-            <div class="taskbar">
+            <div class="taskbar no-print">
                 <div style={{marginLeft: 'auto', padding: '0 5px', border: '2px inset', backgroundColor: 'var(--win-gray)', fontSize: '11px', marginRight: '5px'}}>
                     Rifa do Ivan
                 </div>
