@@ -91,12 +91,43 @@ export const polling = async (req, res) => {
 
 export const webhook = async (req, res) => {
     const payload = req.body;
+    console.log('Asaas Webhook received:', payload.event);
+
     if (payload.event === 'PAYMENT_RECEIVED') {
         const paymentId = payload.payment.id;
-        await prisma.client.updateMany({
+        const description = payload.payment.description || '';
+        
+        console.log(`Processing payment ${paymentId}. Description: ${description}`);
+
+        // 1. Try to match by asaas_id (old approach or if we start saving payment IDs again)
+        let updated = await prisma.client.updateMany({
             where: { asaas_id: paymentId },
             data: { paid: 1 }
         });
+
+        // 2. If not found, try to extract client ID from description (new static QR approach)
+        // Description format: "Rifa do Ivan - Pedido 000123"
+        if (updated.count === 0) {
+            const match = description.match(/Pedido (\d+)/);
+            if (match) {
+                const clientId = parseInt(match[1]);
+                console.log(`Found Client ID ${clientId} in description. Updating status...`);
+                try {
+                    await prisma.client.update({
+                        where: { id: clientId },
+                        data: { paid: 1 }
+                    });
+                    console.log(`Client ${clientId} marked as paid via description match.`);
+                } catch (e) {
+                    console.error(`Failed to update client ${clientId}:`, e.message);
+                }
+            } else {
+                console.log('No Pedido ID found in description.');
+            }
+        } else {
+            console.log(`Payment ${paymentId} updated via asaas_id match.`);
+        }
+        
         res.json({ message: 'OK' });
     } else {
         res.json({ message: 'Ignored event' });
