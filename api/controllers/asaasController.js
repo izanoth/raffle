@@ -19,7 +19,7 @@ console.log('endpoint: ', CUS_ENDPOINT);
         const customerResponse = await fetch(CUS_ENDPOINT, {
             method: 'POST',
             headers: { 'access_token': ASAAS_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, cpfCnpj: cpf, mobilePhone: phone })
+            body: JSON.stringify({ name, cpfCnpj: cpf, mobilePhone: phone, notificationDisabled: true })
         });
 
         if (!customerResponse.ok) {
