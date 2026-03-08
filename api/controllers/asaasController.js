@@ -2,19 +2,18 @@ import prisma from '../db.js';
 import fetch from 'node-fetch';
 
 const ASAAS_KEY = process.env.ASAAS_KEY;
+const PIX_KEY = process.env.PIX_KEY;
 
 // Forced to Production environment as requested
-const BASE_URL = 'https://www.asaas.com/api/v3';
+const BASE_URL = 'https://api.asaas.com/v3';
 
-const CUS_ENDPOINT = process.env.ASAAS_CUS_ENDPOINT || `${BASE_URL}/customers`;
-const PAY_ENDPOINT = process.env.ASAAS_PAY_ENDPOINT || `${BASE_URL}/payments`;
-const QR_ENDPOINT = process.env.ASAAS_QR_ENDPOINT || `${BASE_URL}/payments/{id}/pixQrCode`;
+const CUS_ENDPOINT = `${BASE_URL}/customers`;
+const STATIC_QR_ENDPOINT = `${BASE_URL}/pix/qrCodes/static`;
 
 export const asyncAsaas = async (req, res) => {
     const { client_id, name, cpf, phone, amount } = req.body;
-console.log('endpoint: ', CUS_ENDPOINT);
     try {
-        // 1. Create Customer
+        // 1. Create/Retrieve Customer (still good to have for records, but we'll focus on the QR Code)
         console.log('Asaas: Creating customer for', name);
         const customerResponse = await fetch(CUS_ENDPOINT, {
             method: 'POST',
@@ -22,48 +21,29 @@ console.log('endpoint: ', CUS_ENDPOINT);
             body: JSON.stringify({ name, cpfCnpj: cpf, mobilePhone: phone, notificationDisabled: true })
         });
 
-        if (!customerResponse.ok) {
-            const errorText = await customerResponse.text();
-            console.error('Asaas Customer Error Status:', customerResponse.status);
-            console.error('Asaas Customer Error Body:', errorText);
-            const err = new Error(`Asaas Customer Creation Failed (${customerResponse.status}): ${errorText}`);
-            err.status = customerResponse.status;
-            throw err;
+        // We'll proceed even if customer creation fails or already exists, 
+        // as the main goal now is the static QR Code.
+        let asaas_id = null;
+        if (customerResponse.ok) {
+            const customer = await customerResponse.json();
+            asaas_id = customer.id;
         }
-
-        const customer = await customerResponse.json();
         
-        // 2. Create Payment (PIX)
-        const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 2);
-        
-        console.log('Asaas: Creating payment for customer', customer.id);
-        const paymentResponse = await fetch(PAY_ENDPOINT, {
+        // 2. Create Static QR Code for this specific amount
+        console.log('Asaas: Generating static QR Code for', amount);
+        const qrResponse = await fetch(STATIC_QR_ENDPOINT, {
             method: 'POST',
-            headers: { 'access_token': ASAAS_KEY, 'Content-Type': 'application/json' },
+            headers: { 
+                'access_token': ASAAS_KEY, 
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
             body: JSON.stringify({
-                customer: customer.id,
-                billingType: 'PIX',
+                addressKey: PIX_KEY,
+                description: `Rifa do Ivan - Pedido ${client_id.toString().padStart(6, '0')}`,
                 value: amount,
-                dueDate: dueDate.toISOString().split('T')[0]
+                allowsMultiplePayments: false
             })
-        });
-
-        if (!paymentResponse.ok) {
-            const errorText = await paymentResponse.text();
-            console.error('Asaas Payment Error Status:', paymentResponse.status);
-            console.error('Asaas Payment Error Body:', errorText);
-            const err = new Error(`Asaas Payment Creation Failed (${paymentResponse.status}): ${errorText}`);
-            err.status = paymentResponse.status;
-            throw err;
-        }
-
-        const payment = await paymentResponse.json();
-
-        // 3. Get QR Code
-        console.log('Asaas: Getting QR Code for payment', payment.id);
-        const qrResponse = await fetch(QR_ENDPOINT.replace('{id}', payment.id), {
-            headers: { 'access_token': ASAAS_KEY }
         });
 
         if (!qrResponse.ok) {
@@ -77,11 +57,13 @@ console.log('endpoint: ', CUS_ENDPOINT);
 
         const qrData = await qrResponse.json();
 
-        // Update client with asaas_id
-        await prisma.client.update({
-            where: { id: parseInt(client_id) },
-            data: { asaas_id: payment.id }
-        });
+        // Update client with customer asaas_id if available
+        if (asaas_id) {
+            await prisma.client.update({
+                where: { id: parseInt(client_id) },
+                data: { asaas_id: asaas_id }
+            });
+        }
 
         res.json({
             success: true,
