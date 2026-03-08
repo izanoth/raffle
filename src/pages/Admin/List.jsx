@@ -76,7 +76,7 @@ export function List() {
                                     <th style={{ padding: '8px' }}>Data</th>
                                     <th style={{ padding: '8px' }}>Nome</th>
                                     <th style={{ padding: '8px' }}>Email/Telefone</th>
-                                    <th style={{ padding: '8px' }}>CPF/CNPJ</th>
+                                    <th style={{ padding: '8px' }}>CPF</th>
                                     <th style={{ padding: '8px' }}>Método</th>
                                     <th style={{ padding: '8px' }}>Valor</th>
                                     <th style={{ padding: '8px' }}>Status</th>

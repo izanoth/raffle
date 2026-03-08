@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
-import { validateCpf } from '../../helpers/utils';
+import { validateCpf, maskCpf, maskPhone } from '../../helpers/utils';
 import '@styles';
 
 function SystemTimer() {
@@ -62,9 +62,17 @@ export function Home() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        let newValue = type === 'checkbox' ? checked : value;
+
+        if (name === 'phone') {
+            newValue = maskPhone(value);
+        } else if (name === 'cpf') {
+            newValue = maskCpf(value);
+        }
+
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: newValue
         }));
     };
 
@@ -181,7 +189,7 @@ export function Home() {
                                     name="phone"
                                     value={formData.phone}
                                     onInput={handleChange}
-                                    placeholder={errors.phone || ""}
+                                    placeholder={errors.phone || "(00) 00000-0000"}
                                     autoComplete="tel"
                                     inputMode="tel"
                                     required
@@ -189,14 +197,14 @@ export function Home() {
                             </div>
 
                             <div class={errors.cpf ? "mb-3-with-error" : "mb-3"}>
-                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>CPF/CNPJ:</label>
+                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>CPF:</label>
                                 <input
                                     class="form-control"
                                     type="text"
                                     name="cpf"
                                     value={formData.cpf}
                                     onInput={handleChange}
-                                    placeholder={errors.cpf || ""}
+                                    placeholder={errors.cpf || "000.000.000-00"}
                                     inputMode="numeric"
                                     required
                                 />
