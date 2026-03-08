@@ -90,6 +90,15 @@ export const polling = async (req, res) => {
 };
 
 export const webhook = async (req, res) => {
+    // Security check: Validate the webhook token sent by Asaas
+    const webhookToken = process.env.ASAAS_WEBHOOK_TOKEN;
+    const receivedToken = req.headers['asaas-access-token'];
+
+    if (webhookToken && receivedToken !== webhookToken) {
+        console.warn('Asaas Webhook: Unauthorized access attempt with invalid token.');
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const payload = req.body;
     console.log('Asaas Webhook received:', payload.event);
 
