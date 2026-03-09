@@ -7,6 +7,8 @@ export function Success() {
     const [client, setClient] = useState(null);
     const [bilhetes, setBilhetes] = useState([]);
     const [payInPerson, setPayInPerson] = useState(false);
+    const [modal, setModal] = useState(null);
+    const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -31,18 +33,34 @@ export function Success() {
         }
     }, []);
 
+    const handleSystemControl = (type) => {
+        const contents = {
+            close: {
+                title: 'Impressão Pendente',
+                message: 'Parar agora? Você ainda nem salvou seu bilhete! O sistema recomenda imprimir ou salvar em PDF antes de sair, para garantir sua tranquilidade física e mental.'
+            },
+            minimize: {
+                title: 'Sorte em Primeiro Plano',
+                message: 'O sistema detectou que você está tentando esconder sua vitória. Mantenha os bilhetes visíveis para maximizar o Karma Digital.'
+            },
+            maximize: {
+                title: 'Configurações de Exibição',
+                message: 'Os bilhetes já estão renderizados com a máxima tecnologia XP de suavização. Maximizar agora causaria uma sobrecarga de nostalgia.'
+            }
+        };
+        setPlayfulContent(contents[type]);
+        setModal('playful');
+    };
+
     if (!client) return <div class="window"><div class="window-body">Dados do sistema indisponíveis.</div></div>;
 
     const handlePrint = () => {
         const originalTitle = document.title;
-        // Format: ddmmaa
         const date = new Date();
         const d = String(date.getDate()).padStart(2, '0');
         const m = String(date.getMonth() + 1).padStart(2, '0');
         const y = String(date.getFullYear()).slice(-2);
         const dateStr = `${d}${m}${y}`;
-        
-        // Using a default order number or one from client if available
         const orderId = (client.id || '001').toString().padStart(3, '0');
         
         document.title = `rifa-do-ivan_pedido-no${orderId}_${dateStr}`;
@@ -57,9 +75,9 @@ export function Success() {
             <div class="title-bar no-print">
                 <div class="title-bar-text">Sucesso - Rifa do Ivan</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize">_</button>
-                    <button aria-label="Maximize">口</button>
-                    <button aria-label="Close" onClick={() => route('/')}>×</button>
+                    <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
+                    <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
+                    <button aria-label="Close" onClick={() => handleSystemControl('close')}>×</button>
                 </div>
             </div>
 
@@ -72,7 +90,7 @@ export function Success() {
                     </div>
                 )}
 
-                <div class="inner tokbg" style={{ paddingBottom: '10px', textAlign: 'center', marginBottom: '10px', borderRadius: '30px', color: 'white' }}>
+                <div class="inner tokbg">
                     <table style={{ color: '#000', fontWeight: '900', width: '100%', position: 'relative', textAlign: 'center' }}>
                         <tbody>
                             <tr>
@@ -108,6 +126,38 @@ export function Success() {
                     Rifa do Ivan
                 </div>
             </div>
+
+            {modal === 'playful' && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }} class="no-print">
+                    <div class="window" style={{ maxWidth: '400px', width: '100%' }}>
+                        <div class="title-bar">
+                            <div class="title-bar-text">{playfulContent.title}</div>
+                            <div class="title-bar-controls">
+                                <button aria-label="Close" onClick={() => setModal(null)}>×</button>
+                            </div>
+                        </div>
+                        <div class="window-body">
+                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
+                                <div style={{ 
+                                    width: '48px', height: '48px', background: '#e81123', borderRadius: '50%', 
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', 
+                                    fontSize: '32px', fontWeight: 'bold', flexShrink: 0 
+                                }}>!</div>
+                                <p style={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.4', margin: 0 }}>
+                                    {playfulContent.message}
+                                </p>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <button class="btn" onClick={() => setModal(null)} style={{ width: '100px', fontWeight: 'bold' }}>OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

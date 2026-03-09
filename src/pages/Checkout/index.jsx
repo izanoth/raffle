@@ -8,6 +8,8 @@ export function Checkout() {
     const [showPix, setShowPix] = useState(false);
     const [pixData, setPixData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [modal, setModal] = useState(null);
+    const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -20,6 +22,25 @@ export function Checkout() {
         }
     }, []);
 
+    const handleSystemControl = (type) => {
+        const contents = {
+            close: {
+                title: 'Transação em Curso',
+                message: 'Atenção! Uma transação financeira está sendo processada. Fechar esta janela agora pode criar um paradoxo temporal onde seu bilhete existe e não existe ao mesmo tempo. Conclua o pagamento para estabilizar a realidade.'
+            },
+            minimize: {
+                title: 'Foco no Objetivo',
+                message: 'Minimizar o pagamento não fará o valor sumir. O sistema recomenda manter o foco para garantir sua participação na Rifa do Ivan!'
+            },
+            maximize: {
+                title: 'Visão Panorâmica',
+                message: 'O checkout já está otimizado para sua visão. Maximizar agora causaria um excesso de beleza retrô que seu monitor pode não suportar.'
+            }
+        };
+        setPlayfulContent(contents[type]);
+        setModal('playful');
+    };
+
     const handlePixPayment = async () => {
         setLoading(true);
         try {
@@ -29,7 +50,7 @@ export function Checkout() {
                 body: JSON.stringify({
                     client_id: client.id,
                     name: client.name,
-                    cpf: client.cpf, // Added CPF here
+                    cpf: client.cpf,
                     phone: client.phone,
                     amount: client.amount
                 })
@@ -78,9 +99,9 @@ export function Checkout() {
             <div class="title-bar">
                 <div class="title-bar-text">Pagamento - Rifa do Ivan</div>
                 <div class="title-bar-controls">
-                    <button aria-label="Minimize">_</button>
-                    <button aria-label="Maximize">口</button>
-                    <button aria-label="Close" onClick={() => route('/')}>×</button>
+                    <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
+                    <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
+                    <button aria-label="Close" onClick={() => handleSystemControl('close')}>×</button>
                 </div>
             </div>
 
@@ -134,12 +155,38 @@ export function Checkout() {
                     </div>
                 )}
             </div>
-            
-            <div class="taskbar">
-                <div style={{marginLeft: 'auto', padding: '0 5px', border: '2px inset', backgroundColor: 'var(--win-gray)', fontSize: '11px', marginRight: '5px'}}>
-                    Rifa do Ivan
+
+            {modal === 'playful' && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+                }}>
+                    <div class="window" style={{ maxWidth: '400px', width: '100%' }}>
+                        <div class="title-bar">
+                            <div class="title-bar-text">{playfulContent.title}</div>
+                            <div class="title-bar-controls">
+                                <button aria-label="Close" onClick={() => setModal(null)}>×</button>
+                            </div>
+                        </div>
+                        <div class="window-body">
+                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
+                                <div style={{ 
+                                    width: '48px', height: '48px', background: '#e81123', borderRadius: '50%', 
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', 
+                                    fontSize: '32px', fontWeight: 'bold', flexShrink: 0 
+                                }}>!</div>
+                                <p style={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.4', margin: 0 }}>
+                                    {playfulContent.message}
+                                </p>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <button class="btn" onClick={() => setModal(null)} style={{ width: '100px', fontWeight: 'bold' }}>OK</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

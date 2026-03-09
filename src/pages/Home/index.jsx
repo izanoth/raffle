@@ -28,9 +28,9 @@ export function Home() {
         terms: false
     });
     const [errors, setErrors] = useState({});
-    const [modal, setModal] = useState('intro'); // 'intro', 'contract', 'rules', null
+    const [modal, setModal] = useState('intro'); // 'intro', 'contract', 'rules', 'playful', null
     const [activeWindow, setActiveWindow] = useState('form'); // 'form', 'status'
-    const [showStartMenu, setShowStartMenu] = useState(false);
+    const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
     const [raffleStatus, setRaffleStatus] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
 
@@ -47,16 +47,31 @@ export function Home() {
         }
     };
 
-    const toggleStartMenu = () => setShowStartMenu(!showStartMenu);
+    const handleSystemControl = (type) => {
+        const contents = {
+            close: {
+                title: 'Acesso Negado',
+                message: 'ERRO 403: O botão de fechar foi desativado por questões de segurança. O sistema detectou que você ainda não garantiu sua chance de ganhar! Tentar sair agora pode causar "falta de sorte" crônica.'
+            },
+            minimize: {
+                title: 'Gerenciador de Janelas',
+                message: 'Atenção: Minimizar a sorte não é recomendado. Mantenha a janela aberta para que as vibrações positivas do servidor alcancem seu dispositivo.'
+            },
+            maximize: {
+                title: 'Ajuste de Resolução',
+                message: 'Otimizando para 8K... Brincadeira! Este sistema foi projetado para a resolução perfeita de 2001. Você já está vendo o ápice da tecnologia atual.'
+            }
+        };
+        setPlayfulContent(contents[type]);
+        setModal('playful');
+    };
 
     const openParticipar = () => {
         setActiveWindow('form');
-        setShowStartMenu(false);
     };
 
     const openStatus = () => {
         setActiveWindow('status');
-        setShowStartMenu(false);
         fetchStatus();
     };
 
@@ -96,11 +111,11 @@ export function Home() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
-        if (!formData.name) newErrors.name = 'Error: Missing name';
-        if (!formData.email) newErrors.email = 'Error: Missing email';
-        if (!formData.phone) newErrors.phone = 'Error: Missing phone';
-        if (!validateCpf(formData.cpf)) newErrors.cpf = 'Error: Invalid CPF';
-        if (!formData.terms) newErrors.terms = 'Error: Agreement required';
+        if (!formData.name) newErrors.name = 'Erro: Nome obrigatório';
+        if (!formData.email) newErrors.email = 'Erro: E-mail obrigatório';
+        if (!formData.phone) newErrors.phone = 'Erro: WhatsApp obrigatório';
+        if (!validateCpf(formData.cpf)) newErrors.cpf = 'Erro: CPF inválido';
+        if (!formData.terms) newErrors.terms = 'Erro: Aceite obrigatório';
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -121,35 +136,49 @@ export function Home() {
                 }
                 route('/checkout');
             } else {
-                setErrors({ submit: client.error || 'Registration failed' });
+                setErrors({ submit: client.error || 'Falha no registro' });
             }
         } catch (error) {
-            setErrors({ submit: 'Connection error' });
+            setErrors({ submit: 'Erro de conexão' });
         }
     };
 
     return (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>          
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>          
             {/* Form Window */}
             {activeWindow === 'form' && (
                 <div class="window">
                     <div class="title-bar">
                         <div class="title-bar-text">Rifa do Ivan - Participar</div>
                         <div class="title-bar-controls">
-                            <button aria-label="Minimize" onClick={() => setActiveWindow(null)}>_</button>
-                            <button aria-label="Maximize">口</button>
-                            <button aria-label="Close" onClick={() => setActiveWindow(null)}>×</button>
+                            <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
+                            <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
+                            <button aria-label="Close" onClick={() => handleSystemControl('close')}>×</button>
                         </div>
                     </div>
 
                     <div class="window-body">
-                        <div class="fieldset">
-                            <span class="fieldset-label">Status do Sistema</span>
-                            <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // Hora: <SystemTimer /></p>
-                            <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: 50% do Valor Arrecadado</p>
-                            <p style={{ margin: '5px 0 0 0', fontSize: '11px' }}>
-                                <a href="#" onClick={openRules} style={{ color: 'blue', textDecoration: 'underline' }}>Leia as regras do sorteio</a>
-                            </p>
+                        <div class="header-layout">
+                            {/* Logo integrado - Height dynamically stretches to match fieldset */}
+                            <div class="logo-box">
+                                <img src="/img/rifadoivan.png" alt="Rifa do Ivan" />
+                            </div>
+
+                            <div class="header-info">
+                                <div class="fieldset" style={{ marginBottom: 0 }}>
+                                    <span class="fieldset-label">Status do Sistema</span>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '5px' }}>
+                                        <div>
+                                            <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // <SystemTimer /></p>
+                                            <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: 50% do Arrecadado</p>
+                                            <p style={{ margin: '3px 0 0 0', fontSize: '11px' }}>
+                                                <a href="#" onClick={openRules} style={{ color: 'blue', textDecoration: 'underline' }}>Regras do sorteio</a>
+                                            </p>
+                                        </div>
+                                        <button type="button" class="btn" onClick={openStatus} style={{ fontWeight: 'bold', fontSize: '10px', padding: '5px' }}>Ver Status</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <form onSubmit={handleSubmit}>
@@ -161,10 +190,10 @@ export function Home() {
                                     name="name"
                                     value={formData.name}
                                     onInput={handleChange}
-                                    placeholder={errors.name || ""}
                                     autoComplete="name"
                                     required
                                 />
+                                {errors.name && <p class="error-text">{errors.name}</p>}
                             </div>
 
                             <div class="mb-3">
@@ -175,10 +204,10 @@ export function Home() {
                                     name="email"
                                     value={formData.email}
                                     onInput={handleChange}
-                                    placeholder={errors.email || ""}
                                     autoComplete="email"
                                     required
                                 />
+                                {errors.email && <p class="error-text">{errors.email}</p>}
                             </div>
 
                             <div class="mb-3">
@@ -189,14 +218,15 @@ export function Home() {
                                     name="phone"
                                     value={formData.phone}
                                     onInput={handleChange}
-                                    placeholder={errors.phone || "(00) 00000-0000"}
+                                    placeholder="(00) 00000-0000"
                                     autoComplete="tel"
                                     inputMode="tel"
                                     required
                                 />
+                                {errors.phone && <p class="error-text">{errors.phone}</p>}
                             </div>
 
-                            <div class={errors.cpf ? "mb-3-with-error" : "mb-3"}>
+                            <div class="mb-3">
                                 <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>CPF:</label>
                                 <input
                                     class="form-control"
@@ -204,11 +234,11 @@ export function Home() {
                                     name="cpf"
                                     value={formData.cpf}
                                     onInput={handleChange}
-                                    placeholder={errors.cpf || "000.000.000-00"}
+                                    placeholder="000.000.000-00"
                                     inputMode="numeric"
                                     required
                                 />
-                                {errors.cpf && <p style={{ color: 'red', fontSize: '10px', margin: '2px 0 0 0', position: 'absolute' }}>{errors.cpf}</p>}
+                                {errors.cpf && <p class="error-text">{errors.cpf}</p>}
                             </div>
 
                             <div class="fieldset">
@@ -234,11 +264,11 @@ export function Home() {
                                 </label>
                             </div>
 
-                            {errors.submit && <p style={{ color: 'red', fontSize: '10px' }}>{errors.submit}</p>}
+                            {errors.submit && <p class="error-text" style={{ fontSize: '12px', marginBottom: '10px' }}>{errors.submit}</p>}
 
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '5px' }}>
                                 <button class="btn" type="submit" disabled={!formData.terms}>OK</button>
-                                <button class="btn" type="button" onClick={() => route('/')}>Cancelar</button>
+                                <button class="btn" type="button" onClick={() => handleSystemControl('close')}>Cancelar</button>
                             </div>
                         </form>
                     </div>
@@ -251,9 +281,9 @@ export function Home() {
                     <div class="title-bar">
                         <div class="title-bar-text">Status da Rifa do Ivan</div>
                         <div class="title-bar-controls">
-                            <button aria-label="Minimize" onClick={() => setActiveWindow(null)}>_</button>
-                            <button aria-label="Maximize">口</button>
-                            <button aria-label="Close" onClick={() => setActiveWindow(null)}>×</button>
+                            <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
+                            <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
+                            <button aria-label="Close" onClick={() => setActiveWindow('form')}>×</button>
                         </div>
                     </div>
                     <div class="window-body">
@@ -271,7 +301,7 @@ export function Home() {
                                         <div style={{ height: '15px', backgroundColor: '#fff', border: '1px solid #707070', padding: '1px' }}>
                                             <div style={{ 
                                                 height: '100%', 
-                                                backgroundColor: '#388e3c', 
+                                                backgroundColor: '#0055e5', 
                                                 width: `${Math.min(100, (raffleStatus.totalSold / raffleStatus.goal) * 100)}%`,
                                                 transition: 'width 0.5s ease'
                                             }} />
@@ -283,7 +313,7 @@ export function Home() {
                                     <span class="fieldset-label">Últimos Participantes</span>
                                     <div style={{ maxHeight: '200px', overflowY: 'auto', backgroundColor: '#fff', border: '1px inset' }}>
                                         <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
-                                            <thead style={{ position: 'sticky', top: 0, background: '#ece9d8', borderBottom: '1px solid #707070' }}>
+                                            <thead style={{ position: 'sticky', top: 0, background: 'var(--win-gray)', borderBottom: '1px solid #707070' }}>
                                                 <tr>
                                                     <th style={{ textAlign: 'left', padding: '5px' }}>Email</th>
                                                     <th style={{ textAlign: 'left', padding: '5px' }}>Tel</th>
@@ -307,8 +337,9 @@ export function Home() {
                                         </table>
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
                                     <button class="btn" onClick={fetchStatus} style={{ minWidth: '100px' }}>Atualizar</button>
+                                    <button class="btn" onClick={openParticipar} style={{ minWidth: '100px' }}>Voltar</button>
                                 </div>
                             </div>
                         ) : (
@@ -318,58 +349,6 @@ export function Home() {
                 </div>
             )}
 
-            {/* Start Menu */}
-            {showStartMenu && (
-                <div class="start-menu">
-                    <div class="start-menu-header">
-                        <div style={{ width: '32px', height: '32px', backgroundColor: '#fff', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#245edb' }}>
-                            XP
-                        </div>
-                        <span>Rifa do Ivan</span>
-                    </div>
-                    <div class="start-menu-item" onClick={openParticipar}>
-                        <span style={{ fontSize: '20px' }}>📝</span>
-                        <span>Participar da Rifa</span>
-                    </div>
-                    <div class="start-menu-item" onClick={openStatus}>
-                        <span style={{ fontSize: '20px' }}>📊</span>
-                        <span>Ver Status da Rifa</span>
-                    </div>
-                    <div style={{ borderTop: '1px solid #f0f0f0', margin: '5px 0' }} />
-                    <div class="start-menu-item" onClick={() => { setShowStartMenu(false); setActiveWindow(null); }}>
-                        <span style={{ fontSize: '20px' }}>🚪</span>
-                        <span>Sair</span>
-                    </div>
-                </div>
-            )}
-
-            {/* Taskbar */}
-            <div class="taskbar">
-                <button class="start-btn-xp" onClick={toggleStartMenu}>
-                   <span style={{ fontSize: '18px' }}>田</span> start
-                </button>
-
-                <div style={{ display: 'flex', gap: '5px', marginLeft: '10px' }}>
-                    {activeWindow === 'form' && (
-                        <div style={{ padding: '2px 10px', backgroundColor: '#316ac5', color: 'white', fontSize: '11px', border: '1px solid #003b9b', borderRadius: '3px' }}>
-                            Participar...
-                        </div>
-                    )}
-                    {activeWindow === 'status' && (
-                        <div style={{ padding: '2px 10px', backgroundColor: '#316ac5', color: 'white', fontSize: '11px', border: '1px solid #003b9b', borderRadius: '3px' }}>
-                            Status da Rifa
-                        </div>
-                    )}
-                </div>
-
-                <div style={{ marginLeft: 'auto', padding: '0 5px', border: '2px inset', backgroundColor: 'var(--win-gray)', fontSize: '11px', marginRight: '5px' }}>
-                    Rifa do Ivan
-                </div>
-                <div style={{ border: '2px inset', backgroundColor: 'var(--win-gray)', padding: '0 5px', fontSize: '11px' }}>
-                    <SystemTimer />
-                </div>
-            </div>
-
             {/* Modals */}
             {modal && (
                 <div style={{
@@ -377,20 +356,35 @@ export function Home() {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
                 }}>
-                    <div class="window" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+                    <div class="window" style={{ maxWidth: modal === 'playful' ? '400px' : '600px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
                         <div class="title-bar">
                             <div class="title-bar-text">
                                 {modal === 'intro' ? 'Mensagem do Sistema' : 
-                                 modal === 'contract' ? 'Contrato de Participação' : 'Regras do Sorteio'}
+                                 modal === 'contract' ? 'Contrato de Participação' : 
+                                 modal === 'rules' ? 'Regras do Sorteio' : playfulContent.title}
                             </div>
                             <div class="title-bar-controls">
                                 <button aria-label="Close" onClick={() => setModal(null)}>×</button>
                             </div>
                         </div>
-                        <div class="window-body" style={{ overflowY: 'auto', flex: 1, backgroundColor: 'var(--win-gray)' }}>
-                            {modal === 'intro' ? (
+                        <div class="window-body" style={{ overflowY: 'auto', flex: 1 }}>
+                            {modal === 'playful' ? (
+                                <div style={{ padding: '10px', textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
+                                        <div style={{ 
+                                            width: '48px', height: '48px', background: '#e81123', borderRadius: '50%', 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', 
+                                            fontSize: '32px', fontWeight: 'bold', flexShrink: 0 
+                                        }}>!</div>
+                                        <p style={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.4', margin: 0 }}>
+                                            {playfulContent.message}
+                                        </p>
+                                    </div>
+                                    <button class="btn" onClick={() => setModal(null)} style={{ width: '100px', fontWeight: 'bold' }}>OK</button>
+                                </div>
+                            ) : modal === 'intro' ? (
                                 <div style={{ textAlign: 'center', padding: '10px' }}>
-                                    <div style={{ marginBottom: '20px', border: '2px inset', padding: '15px', backgroundColor: '#fff', textAlign: 'left', lineHeight: '1.6' }}>
+                                    <div style={{ marginBottom: '20px', border: '1px solid #919b9c', padding: '15px', backgroundColor: '#fff', textAlign: 'left', lineHeight: '1.6', borderRadius: '5px' }}>
                                         <p><strong>Olá!</strong></p>
                                         <p>Meu nome é <strong>Ivan</strong> e sou estudante do curso Técnico em Farmácia na <strong>Etec de Itanhaém</strong>.</p>
                                         <p>Quero comprar uma bicicleta e, quem sabe, trocar de celular. Por isso, decidi fazer essa rifa.</p>
@@ -402,33 +396,57 @@ export function Home() {
                                 <div style={{ padding: '10px' }}>
                                     <div style={{ 
                                         backgroundColor: '#fff', 
-                                        border: '2px inset', 
+                                        border: '1px solid #919b9c',
                                         padding: '15px', 
                                         fontSize: '12px', 
                                         lineHeight: '1.4',
-                                        maxHeight: '300px',
-                                        overflowY: 'auto'
+                                        maxHeight: '400px',
+                                        overflowY: 'auto',
+                                        borderRadius: '5px'
                                     }}>
                                         <h2 style={{ fontSize: '14px', textDecoration: 'underline', marginTop: 0, textAlign: 'center' }}>
-                                            {modal === 'contract' ? 'TERMOS DO CONTRATO DIGITAL' : 'REGRAS DO SORTEIO'}
+                                            {modal === 'contract' ? 'Contrato Digital de Participação' : 'REGRAS DO SORTEIO'}
                                         </h2>
                                         
                                         {modal === 'contract' ? (
                                             <>
-                                                <p><strong>1. O que é este contrato?</strong></p>
-                                                <p>Este documento explica como funciona sua participação na minha rifa. Ao aceitar, você concorda com os pontos abaixo.</p>
+                                                <p>Este Contrato Digital de Participação em Rifa do Ivan é celebrado entre Zanoth Tecnologia 46.118.941/0001-25 e o participante da rifa.</p>
 
-                                                <p><strong>2. Como participar</strong></p>
-                                                <p>Você escolhe a quantidade de números (bilhetes) e faz o pagamento via PIX. Cada número te dá uma chance de ganhar o prêmio anunciado.</p>
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>1. Descrição do Serviço</h5>
+                                                <p>1.1. O Organizador conduzirá uma rifa online, na qual os Participantes poderão adquirir números para concorrer a prêmios especificados.</p>
 
-                                                <p><strong>3. E se a rifa for cancelada?</strong></p>
-                                                <p>Se por algum motivo a rifa não puder acontecer (como não atingir o mínimo de vendas), eu, Ivan, devolverei 100% do seu dinheiro automaticamente pelo mesmo PIX que você usou.</p>
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>2. Condições de Participação</h5>
+                                                <p>Os Participantes concordam em cumprir as seguintes condições:</p>
+                                                <p>2.1. Os Participantes devem ser maiores de idade, conforme as leis do seu país de residência.</p>
+                                                <p>2.2. Os Participantes devem adquirir um ou mais números de rifa conforme as regras estabelecidas pelo Organizador.</p>
 
-                                                <p><strong>4. Seus dados estão seguros</strong></p>
-                                                <p>As informações que você preenche (nome, e-mail, telefone) servem apenas para te identificar no sorteio e para que eu possa te entregar o prêmio.</p>
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>3. Cancelamento do Sorteio</h5>
+                                                <p>O Organizador se reserva o direito de cancelar o sorteio por motivos justificáveis, incluindo, mas não se limitando a:</p>
+                                                <p>3.1. Incapacidade de atingir um número mínimo de participantes.</p>
+                                                <p>3.2. Circunstâncias imprevistas, como desastres naturais, emergências de saúde pública ou outras situações fora do controle do Organizador.</p>
 
-                                                <p><strong>5. Ética e Respeito</strong></p>
-                                                <p>Participar da rifa deve ser algo feito de boa fé, respeitando os outros estudantes e o organizador.</p>
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>4. Devolução do Dinheiro</h5>
+                                                <p>4.1. No caso de cancelamento do sorteio, o Organizador se compromete a reembolsar integralmente todos os Participantes que adquiriram números de rifa. O reembolso será processado automaticamente através do mesmo método de pagamento utilizado pelo Participante para adquirir os números de rifa.</p>
+
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>5. Responsabilidades do Organizador</h5>
+                                                <p>O Organizador se compromete a:</p>
+                                                <p>5.1. Conduzir o sorteio de forma justiça e transparente.</p>
+                                                <p>5.2 Garantir a segurança e confidencialidade das informações dos Participantes.</p>
+                                                <p>5.3. Cumprir todas as leis e regulamentos aplicáveis relacionados à realização de rifas online.</p>
+
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>6. Responsabilidades dos Participantes</h5>
+                                                <p>Os Participantes concordam em:</p>
+                                                <p>6.1. Adquirir números de rifa de forma ética e respeitosa.</p>
+                                                <p>6.2. Respeitar todas as regras e regulamentos estabelecidos pelo Organizador.</p>
+                                                <p>6.3. Aceitar as decisões do Organizador como definitivas e vinculativas.</p>
+
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>7. Proteção de Dados</h5>
+                                                <p>7.1. O Organizador concorda em proteger e manter confidenciais todas as informações pessoais fornecidas pelos Participantes durante o processo de participação na rifa. Essas informações serão utilizadas exclusivamente para os fins relacionados à rifa e não serão compartilhadas com terceiros sem consentimento prévio dos Participantes.</p>
+
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>8. Disposições Gerais</h5>
+                                                <p>8.1. Este Contrato constitui o acordo integral entre o Organizador e os Participantes e substitui todos os acordos anteriores ou contemporâneos relacionados ao assunto aqui discutido.</p>
+                                                <p>8.2. Ao clicar no botão "Aceito os termos do contrato digital" ou realizar qualquer ação indicando aceitação deste Contrato durante o processo de participação na rifa, o Participante concorda em cumprir os termos e condições deste Contrato.</p>
+                                                <p>8.3. Este Contrato é válido e eficaz a partir da data em que o Participante realiza a sua participação na rifa.</p>
                                             </>
                                         ) : (
                                             <>
@@ -439,7 +457,8 @@ export function Home() {
                                                 <p>1.4 O sorteio não possui data fixa. O sorteio será realizado assim que a meta mínima de 500 (quinhentos) bilhetes vendidos for alcançada.</p>
 
                                                 <p><strong>2. Do pagamento</strong></p>
-                                                <p>2.1 O pagamento deverá ser feito via PIX após o envio do formulário.</p>
+                                                <p>2.1 O pagamento poderá ser feito via PIX ou presencialmente após o envio do formulário.</p>
+                                                <p>2.2 Em caso de pagamento presencial, o sr(a). deverá entrar em contato com o organizador para validar sua participação.</p>
 
                                                 <p><strong>3. Da efetivação</strong></p>
                                                 <p>3.1 Uma vez o pagamento efetuado, o sr(a). receberá o comprovante da sua participação, contendo os números com os quais concorrerá.</p>
