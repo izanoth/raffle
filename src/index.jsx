@@ -1,4 +1,5 @@
 import { LocationProvider, Router, Route, hydrate, prerender as ssr } from 'preact-iso';
+import { Analytics } from '@vercel/analytics/react';
 
 import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
@@ -29,6 +30,7 @@ export function App() {
 					<Route default component={NotFound} />
 				</Router>
 			</main>
+			<Analytics />
 		</LocationProvider>
 	);
 }
