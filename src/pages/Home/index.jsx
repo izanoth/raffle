@@ -448,10 +448,14 @@ export function Home() {
                                                 <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>7. Proteção de Dados</h5>
                                                 <p>7.1. O Organizador concorda em proteger e manter confidenciais todas as informações pessoais fornecidas pelos Participantes durante o processo de participação na rifa. Essas informações serão utilizadas exclusivamente para os fins relacionados à rifa e não serão compartilhadas com terceiros sem consentimento prévio dos Participantes.</p>
 
-                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>8. Disposições Gerais</h5>
-                                                <p>8.1. Este Contrato constitui o acordo integral entre o Organizador e os Participantes e substitui todos os acordos anteriores ou contemporâneos relacionados ao assunto aqui discutido.</p>
-                                                <p>8.2. Ao clicar no botão "Aceito os termos do contrato digital" ou realizar qualquer ação indicando aceitação deste Contrato durante o processo de participação na rifa, o Participante concorda em cumprir os termos e condições deste Contrato.</p>
-                                                <p>8.3. Este Contrato é válido e eficaz a partir da data em que o Participante realiza a sua participação na rifa.</p>
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>8. Taxas de Transação e Arrecadação</h5>
+                                                <p>8.1. O Participante está ciente de que as transações via PIX podem estar sujeitas a taxas de processamento impostas pela plataforma financeira intermediária (Asaas ou similar).</p>
+                                                <p>8.2. Devido a essas possíveis taxas retidas na fonte por transação, o montante final arrecadado pelo Organizador pode não corresponder exatamente à soma bruta dos valores pagos pelos Participantes, sendo o valor líquido destinado ao propósito da rifa após as devidas deduções operacionais da plataforma.</p>
+
+                                                <h5 style={{ fontSize: '13px', marginBottom: '5px', borderBottom: '1px solid #c0c0c0', paddingBottom: '2px' }}>9. Disposições Gerais</h5>
+                                                <p>9.1. Este Contrato constitui o acordo integral entre o Organizador e os Participantes e substitui todos os acordos anteriores ou contemporâneos relacionados ao assunto aqui discutido.</p>
+                                                <p>9.2. Ao clicar no botão "Aceito os termos do contrato digital" ou realizar qualquer ação indicando aceitação deste Contrato durante o processo de participação na rifa, o Participante concorda em cumprir os termos e condições deste Contrato.</p>
+                                                <p>9.3. Este Contrato é válido e eficaz a partir da data em que o Participante realiza a sua participação na rifa.</p>
                                             </>
                                         ) : (
                                             <>
