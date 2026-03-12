@@ -50,7 +50,6 @@ export function Checkout() {
                 body: JSON.stringify({
                     client_id: client.id,
                     name: client.name,
-                    cpf: client.cpf,
                     phone: client.phone,
                     amount: client.amount
                 })

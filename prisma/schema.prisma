@@ -12,7 +12,7 @@ model Client {
   name      String
   email     String
   phone     String
-  cpf       String   // CPF/CNPJ obrigatório
+  cpf       String?  // CPF/CNPJ agora opcional
   stripe_id String?
   asaas_id  String?
   tickets   String

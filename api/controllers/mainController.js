@@ -1,11 +1,10 @@
 import prisma from '../db.js';
-import { generateTickets, validateCpf } from '../helpers/utils.js';
+import { generateTickets } from '../helpers/utils.js';
 
 export const register = async (req, res) => {
-    const { name, email, phone, cpf, units, terms } = req.body;
+    const { name, email, phone, units, terms } = req.body;
 
     if (!terms) return res.status(400).json({ error: 'Agreement required.' });
-    if (!cpf || !validateCpf(cpf)) return res.status(400).json({ error: 'Valid CPF required.' });
 
     try {
         const amount = parseFloat(units) * 5;
@@ -16,7 +15,6 @@ export const register = async (req, res) => {
                 name,
                 email,
                 phone: phone.replace(/[^\d]+/g, ''),
-                cpf: cpf.replace(/[^\d]+/g, ''),
                 units: parseInt(units),
                 amount,
                 tickets,
