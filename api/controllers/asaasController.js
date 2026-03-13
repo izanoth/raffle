@@ -41,6 +41,12 @@ export const asyncAsaas = async (req, res) => {
 
         const qrData = await qrResponse.json();
 
+        // Update client with the QR code ID to flag as PIX intention
+        await prisma.client.update({
+            where: { id: parseInt(client_id) },
+            data: { asaas_id: qrData.id || 'PIX_STATIC' }
+        });
+
         res.json({
             success: true,
             payload: qrData.payload,
@@ -78,17 +84,23 @@ export const webhook = async (req, res) => {
     const payload = req.body;
     console.log('Asaas Webhook received:', payload.event);
 
-    if (payload.event === 'PAYMENT_RECEIVED') {
+    if (payload.event === 'PAYMENT_RECEIVED' || payload.event === 'PAYMENT_CONFIRMED') {
         const paymentId = payload.payment.id;
+        const pixQrCodeId = payload.payment.pixQrCodeId;
         const description = payload.payment.description || '';
         
-        console.log(`Processing payment ${paymentId}. Description: ${description}`);
+        console.log(`Processing payment ${paymentId}. PixQrCodeId: ${pixQrCodeId}. Description: ${description}`);
 
-        // 1. Try to match by asaas_id (old approach or if we start saving payment IDs again)
-        let updated = await prisma.client.updateMany({
-            where: { asaas_id: paymentId },
-            data: { paid: 1 }
-        });
+        // 1. Try to match by asaas_id (matches our saved pixQrCodeId)
+        let updated = { count: 0 };
+        const idToMatch = pixQrCodeId || paymentId;
+        
+        if (idToMatch) {
+             updated = await prisma.client.updateMany({
+                where: { asaas_id: idToMatch },
+                data: { paid: 1 }
+            });
+        }
 
         // 2. If not found, try to extract client ID from description (new static QR approach)
         // Description format: "Rifa do Ivan - Pedido 000123"

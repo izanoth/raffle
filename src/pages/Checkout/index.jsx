@@ -43,6 +43,9 @@ export function Checkout() {
 
     const handlePixPayment = async () => {
         setLoading(true);
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('payInPerson');
+        }
         try {
             const response = await fetch('/api/asaas', {
                 method: 'POST',
