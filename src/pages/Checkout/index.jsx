@@ -91,7 +91,7 @@ export function Checkout() {
             } catch (error) {
                 console.error('Polling error:', error);
             }
-        }, 5000); 
+        }, 2000); 
     };
 
     if (!client) return <div class="window"><div class="window-body">Carregando dados do usuário...</div></div>;

@@ -5,10 +5,11 @@ const ASAAS_KEY = process.env.ASAAS_KEY;
 const PIX_KEY = process.env.PIX_KEY;
 
 // Forced to Production environment as requested
-const BASE_URL = 'https://api.asaas.com/v3';
+//const BASE_URL = 'https://api.asaas.com/v3';
 
-const CUS_ENDPOINT = `${BASE_URL}/customers`;
-const STATIC_QR_ENDPOINT = `${BASE_URL}/pix/qrCodes/static`;
+//const CUS_ENDPOINT = `${BASE_URL}/customers`;
+const CUS_ENDPOINT = process.env.ASAAS_CUS_ENDPOINT;
+const STATIC_QR_ENDPOINT = process.env.ASAAS_STATIC_QR_ENDPOINT;
 
 export const asyncAsaas = async (req, res) => {
     const { client_id, name, amount } = req.body;
