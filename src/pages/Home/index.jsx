@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
-import { maskPhone } from '../../helpers/utils';
+import { maskPhone, maskCpf, validateCpf } from '../../helpers/utils';
 import '@styles';
 
 function SystemTimer() {
@@ -23,6 +23,7 @@ export function Home() {
         name: '',
         email: '',
         phone: '',
+        cpf: '',
         units: 1,
         terms: false
     });
@@ -82,6 +83,10 @@ export function Home() {
             newValue = maskPhone(value);
         }
 
+        if (name === 'cpf') {
+            newValue = maskCpf(value);
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: newValue
@@ -111,6 +116,9 @@ export function Home() {
         if (!formData.name) newErrors.name = 'Erro: Nome obrigatório';
         if (!formData.email) newErrors.email = 'Erro: E-mail obrigatório';
         if (!formData.phone) newErrors.phone = 'Erro: WhatsApp obrigatório';
+        if (formData.cpf && !validateCpf(formData.cpf)) {
+            newErrors.cpf = 'Erro: CPF inválido';
+        }
         if (!formData.terms) newErrors.terms = 'Erro: Aceite obrigatório';
 
         if (Object.keys(newErrors).length > 0) {
@@ -220,6 +228,20 @@ export function Home() {
                                     required
                                 />
                                 {errors.phone && <p class="error-text">{errors.phone}</p>}
+                            </div>
+
+                            <div class="mb-3">
+                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>CPF (Opcional):</label>
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    name="cpf"
+                                    value={formData.cpf}
+                                    onInput={handleChange}
+                                    placeholder="000.000.000-00"
+                                    inputMode="numeric"
+                                />
+                                {errors.cpf && <p class="error-text">{errors.cpf}</p>}
                             </div>
 
                             <div class="fieldset">

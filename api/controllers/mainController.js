@@ -2,7 +2,7 @@ import prisma from '../db.js';
 import { generateTickets } from '../helpers/utils.js';
 
 export const register = async (req, res) => {
-    const { name, email, phone, units, terms } = req.body;
+    const { name, email, phone, cpf, units, terms } = req.body;
 
     if (!terms) return res.status(400).json({ error: 'Agreement required.' });
 
@@ -15,6 +15,7 @@ export const register = async (req, res) => {
                 name,
                 email,
                 phone: phone.replace(/[^\d]+/g, ''),
+                cpf: cpf ? cpf.replace(/[^\d]+/g, '') : null,
                 units: parseInt(units),
                 amount,
                 tickets,

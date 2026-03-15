@@ -2,60 +2,90 @@ import prisma from '../db.js';
 import fetch from 'node-fetch';
 
 const ASAAS_KEY = process.env.ASAAS_KEY;
-const PIX_KEY = process.env.PIX_KEY;
 
-// Forced to Production environment as requested
-//const BASE_URL = 'https://api.asaas.com/v3';
-
-//const CUS_ENDPOINT = `${BASE_URL}/customers`;
+// Endpoints vindos do .env
 const CUS_ENDPOINT = process.env.ASAAS_CUS_ENDPOINT;
-const STATIC_QR_ENDPOINT = process.env.ASAAS_STATIC_QR_ENDPOINT;
+const PAY_ENDPOINT = process.env.ASAAS_PAY_ENDPOINT;
+const QR_ENDPOINT = process.env.ASAAS_QR_ENDPOINT;
 
 export const asyncAsaas = async (req, res) => {
-    const { client_id, name, amount } = req.body;
+    const { client_id, name, cpf, phone, amount } = req.body;
+    
     try {
-        // 1. Create Static QR Code for this specific amount
-        console.log('Asaas: Generating static QR Code for', amount);
-        const qrResponse = await fetch(STATIC_QR_ENDPOINT, {
+        // 1. Criar ou Atualizar Cliente (notificationDisabled: true)
+        console.log('Asaas: Criando/buscando cliente para', name);
+        const customerResponse = await fetch(CUS_ENDPOINT, {
             method: 'POST',
-            headers: { 
-                'access_token': ASAAS_KEY, 
-                'Content-Type': 'application/json',
-                'accept': 'application/json'
-            },
-            body: JSON.stringify({
-                addressKey: PIX_KEY,
-                description: `Rifa do Ivan - Pedido ${client_id.toString().padStart(6, '0')}`,
-                value: amount,
-                allowsMultiplePayments: false
+            headers: { 'access_token': ASAAS_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                name, 
+                cpfCnpj: cpf, 
+                mobilePhone: phone,
+                notificationDisabled: true 
             })
+        });
+
+        if (!customerResponse.ok) {
+            const errorText = await customerResponse.text();
+            throw new Error(`Erro na criação do cliente Asaas: ${errorText}`);
+        }
+
+        const customer = await customerResponse.json();
+        
+        // 2. Criar Cobrança Dinâmica (PIX)
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 1); // Vencimento para amanhã
+        
+        console.log('Asaas: Gerando cobrança para cliente', customer.id);
+        const paymentResponse = await fetch(PAY_ENDPOINT, {
+            method: 'POST',
+            headers: { 'access_token': ASAAS_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                customer: customer.id,
+                billingType: 'PIX',
+                value: amount,
+                dueDate: dueDate.toISOString().split('T')[0],
+                description: `Rifa do Ivan - Pedido ${client_id.toString().padStart(6, '0')}`,
+                externalReference: client_id.toString()
+            })
+        });
+
+        if (!paymentResponse.ok) {
+            const errorText = await paymentResponse.text();
+            throw new Error(`Erro na criação da cobrança Asaas: ${errorText}`);
+        }
+
+        const payment = await paymentResponse.json();
+
+        // 3. Obter QR Code Dinâmico
+        console.log('Asaas: Buscando QR Code para pagamento', payment.id);
+        const qrResponse = await fetch(QR_ENDPOINT.replace('{id}', payment.id), {
+            headers: { 'access_token': ASAAS_KEY }
         });
 
         if (!qrResponse.ok) {
             const errorText = await qrResponse.text();
-            console.error('Asaas QR Error Status:', qrResponse.status);
-            console.error('Asaas QR Error Body:', errorText);
-            const err = new Error(`Asaas QR Code Generation Failed (${qrResponse.status}): ${errorText}`);
-            err.status = qrResponse.status;
-            throw err;
+            throw new Error(`Erro na geração do QR Code: ${errorText}`);
         }
 
         const qrData = await qrResponse.json();
 
-        // Update client with the QR code ID to flag as PIX intention
+        // Atualizar o cliente no banco com o ID da cobrança para o webhook
         await prisma.client.update({
             where: { id: parseInt(client_id) },
-            data: { asaas_id: qrData.id || 'PIX_STATIC' }
+            data: { asaas_id: payment.id }
         });
 
         res.json({
             success: true,
             payload: qrData.payload,
-            qrcode: qrData.encodedImage
+            qrcode: qrData.encodedImage,
+            paymentId: payment.id
         });
+
     } catch (error) {
-        console.error('Asaas error:', error);
-        res.status(error.status || 500).json({ 
+        console.error('Erro Asaas Flow:', error);
+        res.status(500).json({ 
             success: false,
             error: error.message 
         });
@@ -87,43 +117,28 @@ export const webhook = async (req, res) => {
 
     if (payload.event === 'PAYMENT_RECEIVED' || payload.event === 'PAYMENT_CONFIRMED') {
         const paymentId = payload.payment.id;
-        const pixQrCodeId = payload.payment.pixQrCodeId;
-        const description = payload.payment.description || '';
+        const externalReference = payload.payment.externalReference;
         
-        console.log(`Processing payment ${paymentId}. PixQrCodeId: ${pixQrCodeId}. Description: ${description}`);
+        console.log(`Processing payment ${paymentId}. ExternalReference: ${externalReference}`);
 
-        // 1. Try to match by asaas_id (matches our saved pixQrCodeId)
-        let updated = { count: 0 };
-        const idToMatch = pixQrCodeId || paymentId;
-        
-        if (idToMatch) {
-             updated = await prisma.client.updateMany({
-                where: { asaas_id: idToMatch },
-                data: { paid: 1 }
-            });
-        }
+        // 1. Try to match by asaas_id
+        const updated = await prisma.client.updateMany({
+            where: { asaas_id: paymentId },
+            data: { paid: 1 }
+        });
 
-        // 2. If not found, try to extract client ID from description (new static QR approach)
-        // Description format: "Rifa do Ivan - Pedido 000123"
-        if (updated.count === 0) {
-            const match = description.match(/Pedido (\d+)/);
-            if (match) {
-                const clientId = parseInt(match[1]);
-                console.log(`Found Client ID ${clientId} in description. Updating status...`);
-                try {
-                    await prisma.client.update({
-                        where: { id: clientId },
-                        data: { paid: 1 }
-                    });
-                    console.log(`Client ${clientId} marked as paid via description match.`);
-                } catch (e) {
-                    console.error(`Failed to update client ${clientId}:`, e.message);
-                }
-            } else {
-                console.log('No Pedido ID found in description.');
+        // 2. If not found by ID, try by externalReference (client_id)
+        if (updated.count === 0 && externalReference) {
+            const clientId = parseInt(externalReference);
+            try {
+                await prisma.client.update({
+                    where: { id: clientId },
+                    data: { paid: 1 }
+                });
+                console.log(`Client ${clientId} marked as paid via externalReference.`);
+            } catch (e) {
+                console.error(`Failed to update client ${clientId}:`, e.message);
             }
-        } else {
-            console.log(`Payment ${paymentId} updated via asaas_id match.`);
         }
         
         res.json({ message: 'OK' });
