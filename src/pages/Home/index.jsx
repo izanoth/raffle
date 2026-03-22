@@ -341,7 +341,7 @@ export function Home() {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
                 }}>
-                    <div class="window" style={{ maxWidth: modal === 'playful' ? '400px' : '600px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+                    <div class="window" style={{ maxWidth: (modal === 'playful' || modal === 'intro') ? '320px' : '600px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
                         <div class="title-bar">
                             <div class="title-bar-text">
                                 {modal === 'intro' ? 'Mensagem do Sistema' : 
