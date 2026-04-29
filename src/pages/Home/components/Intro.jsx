@@ -15,7 +15,7 @@ export function Intro({ onClose }) {
                         Se você chegou até aqui, provavelmente fui eu quem fez sua entrega <Bike size={18} className="inline-block text-red-500 mx-1" />
                     </p>
                     <p>
-                        Meu nome é <strong>Ivan</strong> — trabalho com delivery e também desenvolvo sistemas. Criei essa rifa como uma forma de gerar uma renda extra enquanto sigo focado nos estudos e nos meus projetos.
+                        Meu nome é <strong>Ivan</strong> — trabalho com delivery e também desenvolvo sistemas. A correria de entregador não é leve, então criei essa rifa como uma forma de complementar minha renda enquanto sigo focado nos estudos.
                     </p>
                     <p>
                         A proposta é simples: você participa com um valor acessível via PIX e concorre ao prêmio desta rifa. Todo o processo é organizado, com confirmação automática do pagamento e acompanhamento dos números.
