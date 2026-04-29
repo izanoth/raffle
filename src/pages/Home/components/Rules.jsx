@@ -1,21 +1,21 @@
-import { ScrollText, Trophy, Wallet, CheckCircle } from 'lucide-preact';
+import { ScrollText, Trophy, Wallet, CheckCircle, Clock } from 'lucide-preact';
 
 export function Rules({ onClose }) {
     const rules = [
         {
             icon: <ScrollText size={20} className="text-blue-500" />,
             title: "Regras Gerais",
-            text: "Cada bilhete custa R$ 5,00. O sorteio ocorre ao atingir a meta de 52 bilhetes."
+            text: "Cada bilhete custa R$ 5,00. A meta para o sorteio é de 52 bilhetes vendidos."
+        },
+        {
+            icon: <Clock size={20} className="text-indigo-500" />,
+            title: "Prazo do Sorteio",
+            text: "O sorteio ocorrerá após a meta de 52 bilhetes ser batida ou em 45 dias."
         },
         {
             icon: <Wallet size={20} className="text-emerald-500" />,
             title: "Pagamento",
             text: "Aceitamos PIX automático para sua maior comodidade e segurança."
-        },
-        {
-            icon: <CheckCircle size={20} className="text-purple-500" />,
-            title: "Efetivação",
-            text: "Após o pagamento, você recebe um comprovante digital com seus números."
         },
         {
             icon: <Trophy size={20} className="text-amber-500" />,

@@ -20,9 +20,22 @@ import {
     Clock,
     X,
     Maximize2,
-    MinusSquare
+    MinusSquare,
+    CalendarDays
 } from 'lucide-preact';
 import '@styles';
+
+/**
+ * DOCUMENTAÇÃO DE REGRAS DE NEGÓCIO:
+ * 1. Data de Início Estática: 29 de Abril de 2026.
+ * 2. Prazo Limite: 45 dias a partir do início.
+ * 3. Meta de Bilhetes: 52 unidades.
+ * 4. Lógica do Sorteio: O sorteio ocorre ao atingir 52 bilhetes OU 45 dias.
+ * 5. Se a meta for batida antes dos 45 dias, o sistema continua aceitando bilhetes até o fim do prazo.
+ */
+const START_DATE = new Date('2026-04-29T00:00:00');
+const RAFFLE_DURATION_DAYS = 45;
+const GOAL_TICKETS = 52;
 
 function SystemTimer() {
     const [timer, setTimer] = useState('00:00:00');
@@ -53,6 +66,24 @@ export function Home() {
     const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
     const [raffleStatus, setRaffleStatus] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
+    const [daysRemaining, setDaysRemaining] = useState(RAFFLE_DURATION_DAYS);
+
+    useEffect(() => {
+        // Cálculo do prazo restante
+        const calculateTime = () => {
+            const now = new Date();
+            const end = new Date(START_DATE);
+            end.setDate(end.getDate() + RAFFLE_DURATION_DAYS);
+            
+            const diffTime = end - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            setDaysRemaining(Math.max(0, diffDays));
+        };
+
+        calculateTime();
+        const timer = setInterval(calculateTime, 3600000); // Atualiza a cada hora
+        return () => clearInterval(timer);
+    }, []);
 
     const fetchStatus = async () => {
         setLoadingStatus(true);
@@ -193,7 +224,7 @@ export function Home() {
                 </div>
 
                 {activeWindow === 'form' ? (
-                    <div className="modern-card animate-fade-in">
+                    <div className="modern-card">
                         {/* Fake Window Controls (Modern) */}
                         <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-3 flex justify-between items-center">
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -215,7 +246,7 @@ export function Home() {
                                 <div>
                                     <h4 className="text-sm font-bold text-blue-900">Prêmio: 50% do Arrecadado</h4>
                                     <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
-                                        Participe e ajude o Ivan em seus estudos. <a href="#" onClick={openRules} className="underline font-bold">Ver regras do sorteio</a>.
+                                        Garanta sua chance e ajude-me nos estudos. <a href="#" onClick={openRules} className="underline font-bold">Ver regras</a>.
                                     </p>
                                 </div>
                             </div>
@@ -224,8 +255,8 @@ export function Home() {
                                 <div className="grid md:grid-cols-1 gap-5">
                                     <div>
                                         <label className="label-text">Nome Completo</label>
-                                        <div className="relative">
-                                            <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                        <div className="relative flex items-center">
+                                            <User size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                                             <input
                                                 className="input-field"
                                                 type="text"
@@ -241,8 +272,8 @@ export function Home() {
 
                                     <div>
                                         <label className="label-text">E-mail</label>
-                                        <div className="relative">
-                                            <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                        <div className="relative flex items-center">
+                                            <Mail size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                                             <input
                                                 className="input-field"
                                                 type="email"
@@ -258,8 +289,8 @@ export function Home() {
 
                                     <div>
                                         <label className="label-text">WhatsApp</label>
-                                        <div className="relative">
-                                            <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                        <div className="relative flex items-center">
+                                            <Phone size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                                             <input
                                                 className="input-field"
                                                 type="tel"
@@ -357,27 +388,44 @@ export function Home() {
                                 </div>
                             ) : raffleStatus ? (
                                 <div className="space-y-8">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                <Ticket size={12} /> Bilhetes
+                                            </p>
+                                            <h3 className="text-2xl font-black text-slate-900">
+                                                {raffleStatus.totalSold} <span className="text-sm text-slate-400 font-medium">/ {GOAL_TICKETS}</span>
+                                            </h3>
+                                        </div>
+                                        <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
+                                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                <CalendarDays size={12} /> Prazo Restante
+                                            </p>
+                                            <h3 className="text-2xl font-black text-blue-700">
+                                                {daysRemaining} <span className="text-sm font-medium opacity-60">dias</span>
+                                            </h3>
+                                        </div>
+                                    </div>
+
                                     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
                                         <div className="flex justify-between items-end mb-4">
-                                            <div>
-                                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Progresso</p>
-                                                <h3 className="text-3xl font-black text-slate-900">
-                                                    {raffleStatus.totalSold} <span className="text-lg text-slate-400 font-medium">/ {raffleStatus.goal}</span>
-                                                </h3>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-2xl font-black text-blue-600">
-                                                    {Math.round((raffleStatus.totalSold / raffleStatus.goal) * 100)}%
-                                                </p>
-                                            </div>
+                                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Progresso da Meta</p>
+                                            <p className="text-xl font-black text-blue-600">
+                                                {Math.round((raffleStatus.totalSold / GOAL_TICKETS) * 100)}%
+                                            </p>
                                         </div>
                                         
                                         <div className="h-4 bg-white rounded-full border border-slate-200 p-1 overflow-hidden shadow-inner">
                                             <div 
                                                 className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-sm"
-                                                style={{ width: `${Math.min(100, (raffleStatus.totalSold / raffleStatus.goal) * 100)}%` }}
+                                                style={{ width: `${Math.min(100, (raffleStatus.totalSold / GOAL_TICKETS) * 100)}%` }}
                                             />
                                         </div>
+                                        {raffleStatus.totalSold >= GOAL_TICKETS && (
+                                            <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mt-3 text-center">
+                                                Meta atingida! O sorteio ocorrerá ao fim do prazo.
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -446,7 +494,7 @@ export function Home() {
 
             {/* Modern Modal System */}
             {modal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
                     <div className={`modern-card w-full max-h-[90vh] flex flex-col ${
                         (modal === 'playful' || modal === 'intro') ? 'max-w-xs' : 'max-w-2xl'
                     }`}>
