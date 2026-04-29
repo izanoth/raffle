@@ -1,290 +1,90 @@
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+}
 
 :root {
-  --win-gray: #ece9d8; /* XP Cream */
-  --win-white: #ffffff;
-  --win-shadow: #707070;
-  --win-blue: #0055e5; /* XP Blue */
-  --win-bg: #245edb; /* XP Taskbar Blue */
-  --xp-orange: #ff8e00;
-  --xp-red: #cc3000;
-  --win-text: #000000;
+  --primary-color: #3b82f6;
 }
 
 body {
-  background: #3a6ea5 url('img/wp-dark.png') no-repeat center center fixed;
-  background-size: cover;
-  color: var(--win-text);
-  font-family: 'Tahoma', 'Arial', sans-serif;
-  margin: 0;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Centralização vertical e horizontal */
-  min-height: 100vh;
-  box-sizing: border-box;
+  @apply bg-slate-50 text-slate-900 min-h-screen font-sans;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(210,100%,98%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(210,100%,95%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(210,100%,98%,1) 0, transparent 50%);
 }
 
-/* Window Style - 100% XP */
-.window {
-  background-color: var(--win-gray);
-  border: 3px solid var(--win-blue);
-  border-radius: 8px 8px 0 0;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-  padding: 0;
-  width: 100%;
-  max-width: 700px;
-  margin: auto; /* Ajuda na centralização */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: auto; /* Deixa a janela compacta ao conteúdo */
-  max-height: 95vh; /* Evita que a janela suma em telas muito pequenas */
+.modern-card {
+  @apply bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden;
 }
 
-@media (max-width: 600px) {
-  body {
-    padding: 10px;
-    align-items: center; /* Garante centralização em smartphones */
-  }
-  .window {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
-    border: 3px solid var(--win-blue); /* Mantém a borda XP mesmo em mobile */
-    border-radius: 8px 8px 0 0;
-  }
-  .window-body {
-    padding: 12px;
-  }
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
 }
 
-.title-bar {
-  background: linear-gradient(180deg, #0058e6 0%, #3a91ff 10%, #2a81ef 30%, #1c6ce3 50%, #155bd3 70%, #0849bd 100%);
-  padding: 3px 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 25px;
-  border-bottom: 1px solid #003b9b;
-  flex-shrink: 0;
+.btn-secondary {
+  @apply bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 active:scale-[0.98];
 }
 
-.title-bar-text {
-  color: white;
-  font-weight: bold;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  text-shadow: 1px 1px 1px #003b9b;
+.input-field {
+  @apply w-full bg-slate-50 border border-slate-200 rounded-xl py-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
+  padding-left: 3.5rem; /* 56px */
+  padding-right: 1rem;
 }
 
-.title-bar-controls {
-    display: flex;
-    gap: 2px;
+.label-text {
+  @apply block text-sm font-medium text-slate-700 mb-1.5 ml-1;
 }
 
-.title-bar-controls button {
-  width: 21px;
-  height: 21px;
-  background-color: #3d95ff;
-  border: 1px solid #fff;
-  border-radius: 3px;
-  font-size: 10px;
-  padding: 0;
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  box-shadow: inset -1px -1px 1px rgba(0,0,0,0.2);
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.title-bar-controls button[aria-label="Close"] {
-    background: linear-gradient(180deg, #f24537 0%, #c72c2c 100%);
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.window-body {
-  padding: 15px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+/* Glassmorphism */
+.glass {
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
 }
 
-/* UI Elements */
-.fieldset {
-  border: 1px solid #919b9c;
-  border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 15px;
-  position: relative;
-  background: #fff;
+/* Comprovante / Receipt Rendering Logic - Modernized */
+.receipt-container {
+    @apply bg-gradient-to-br from-indigo-600 to-blue-700 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden;
 }
 
-.fieldset-label {
-  position: absolute;
-  top: -10px;
-  left: 10px;
-  background: var(--win-gray);
-  padding: 0 5px;
-  font-size: 11px;
-  color: #003b9b;
-  font-weight: bold;
-}
-
-.form-control {
-  border: 1px solid #7f9db9;
-  background-color: var(--win-white);
-  padding: 8px 4px;
-  font-size: 16px;
-  color: #000;
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 5px;
-}
-
-.btn {
-  background: linear-gradient(180deg, #ffffff 0%, #ece9d8 100%);
-  border: 1px solid #003b9b;
-  border-radius: 3px;
-  padding: 5px 15px;
-  cursor: pointer;
-  font-size: 12px;
-  color: #000;
-  box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-}
-
-.btn:hover {
-    background: linear-gradient(180deg, #fff 0%, #ff8e00 100%);
-}
-
-.btn:active {
-  background: #dcd8c0;
-  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-.logo-box {
-    width: 85px; 
-    border: 2px inset;
-    background: #fff;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    image-rendering: pixelated;
-    overflow: hidden;
-}
-
-.logo-box img {
+.receipt-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-.header-layout {
-    display: flex;
-    gap: 15px;
-    align-items: stretch;
-    margin-bottom: 15px;
-}
-
-.header-info {
-    flex-grow: 1;
-}
-
-@media (max-width: 480px) {
-    .header-layout {
-        flex-direction: row; 
-        align-items: stretch;
-    }
-}
-
-.mb-3 {
-    margin-bottom: 15px;
-}
-
-.error-text {
-    color: #cc3000;
-    font-size: 10px;
-    margin: 2px 0 0 0;
-    font-weight: bold;
-}
-
-/* Comprovante / Receipt Rendering Logic */
-.tokbg {
-    background-image: url('/img/maskbg2.png');
-    background-repeat: repeat;
-    color: white;
-    width: 320px;
-    margin: auto;
-    text-align: center;
-    border-radius: 30px;
-    padding: 20px 10px;
-    box-sizing: border-box;
-}
-
-p.mask {
-    background: url('/img/mask.png') 0 0 / cover repeat;
-    color: #de466c;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-    font-weight: 900;
-}
-
-/* Marker for non-printable elements */
-.no-print {
-}
-
-/* Print Styles */
+/* Print Styles Modernized */
 @media print {
   body {
     background: white !important;
     padding: 0 !important;
-    margin: 0 !important;
-    display: block !important;
   }
-
   .no-print {
     display: none !important;
-  }
-
-  .window {
-    border: none !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    background: white !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-
-  .window-body {
-    background: white !important;
-    padding: 0 !important;
-    overflow-y: visible !important;
-  }
-
-  .tokbg {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    background-image: url('/img/maskbg2.png') !important;
-    border-radius: 20px !important;
-    width: 100% !important;
-    max-width: 400px;
-    margin: 20px auto !important;
-  }
-
-  p.mask {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    background: url('/img/mask.png') 0 0 / cover repeat !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: #de466c !important; /* Fallback */
-  }
-
-  .fieldset {
-    border: 1px solid #ccc !important;
-    margin-bottom: 10px !important;
   }
 }

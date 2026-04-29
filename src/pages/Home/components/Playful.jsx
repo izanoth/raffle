@@ -1,17 +1,22 @@
+import { AlertCircle } from 'lucide-preact';
+
 export function Playful({ content, onClose }) {
     return (
-        <div style={{ padding: '10px', textAlign: 'center' }}>
-            <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ 
-                    width: '48px', height: '48px', background: '#e81123', borderRadius: '50%', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', 
-                    fontSize: '32px', fontWeight: 'bold', flexShrink: 0 
-                }}>!</div>
-                <p style={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.4', margin: 0 }}>
-                    {content.message}
-                </p>
+        <div className="p-6 text-center">
+            <div className="flex flex-col items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center">
+                    <AlertCircle size={40} />
+                </div>
+                <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-slate-900">{content.title}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                        {content.message}
+                    </p>
+                </div>
             </div>
-            <button class="btn" onClick={onClose} style={{ width: '100px', fontWeight: 'bold' }}>OK</button>
+            <button className="btn-primary w-full" onClick={onClose}>
+                Entendido
+            </button>
         </div>
     );
 }

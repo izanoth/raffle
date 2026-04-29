@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
+import { 
+    CreditCard, 
+    QrCode, 
+    ArrowLeft, 
+    Copy, 
+    CheckCircle2, 
+    AlertCircle,
+    X,
+    ShieldCheck,
+    Loader2
+} from 'lucide-preact';
 import '@styles';
 
 export function Checkout() {
@@ -10,6 +21,7 @@ export function Checkout() {
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState(null);
     const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -25,16 +37,16 @@ export function Checkout() {
     const handleSystemControl = (type) => {
         const contents = {
             close: {
-                title: 'Transação em Curso',
-                message: 'Atenção! Uma transação financeira está sendo processada. Fechar esta janela agora pode criar um paradoxo temporal onde seu bilhete existe e não existe ao mesmo tempo. Conclua o pagamento para estabilizar a realidade.'
+                title: 'Transação Segura',
+                message: 'Atenção! Uma transação está em curso. Fechar agora pode interromper o registro da sua participação. Conclua o processo para garantir seu lugar no sorteio.'
             },
             minimize: {
-                title: 'Foco no Objetivo',
-                message: 'Minimizar o pagamento não fará o valor sumir. O sistema recomenda manter o foco para garantir sua participação na Rifa do Ivan!'
+                title: 'Foco no Pagamento',
+                message: 'O sistema recomenda manter esta janela ativa para processamento prioritário da sua sorte.'
             },
             maximize: {
-                title: 'Visão Panorâmica',
-                message: 'O checkout já está otimizado para sua visão. Maximizar agora causaria um excesso de beleza retrô que seu monitor pode não suportar.'
+                title: 'Interface Otimizada',
+                message: 'O checkout já está na escala ideal para segurança e clareza. Não é necessário ampliar.'
             }
         };
         setPlayfulContent(contents[type]);
@@ -43,9 +55,6 @@ export function Checkout() {
 
     const handlePixPayment = async () => {
         setLoading(true);
-        if (typeof window !== 'undefined') {
-            sessionStorage.removeItem('payInPerson');
-        }
         try {
             const response = await fetch('/api/asaas', {
                 method: 'POST',
@@ -72,13 +81,6 @@ export function Checkout() {
         }
     };
 
-    const handlePayInPerson = () => {
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem('payInPerson', 'true');
-        }
-        route('/success');
-    };
-
     const startPolling = () => {
         const interval = setInterval(async () => {
             try {
@@ -94,101 +96,182 @@ export function Checkout() {
         }, 2000); 
     };
 
-    if (!client) return <div class="window"><div class="window-body">Carregando dados do usuário...</div></div>;
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(pixData.payload);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    if (!client) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="animate-spin text-blue-600" size={32} />
+            </div>
+        );
+    }
 
     return (
-        <div class="window">
-            <div class="title-bar">
-                <div class="title-bar-text">Pagamento - Rifa do Ivan</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
-                    <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
-                    <button aria-label="Close" onClick={() => handleSystemControl('close')}>×</button>
-                </div>
-            </div>
+        <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center animate-fade-in">
+            <div className="w-full max-w-lg">
+                <button 
+                    onClick={() => route('/')}
+                    className="mb-6 flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold transition-colors group"
+                >
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                    Voltar e alterar dados
+                </button>
 
-            <div class="window-body">
-                <div class="fieldset">
-                    <span class="fieldset-label">Resumo do Pedido</span>
-                    <p style={{ margin: '0', fontSize: '11px' }}>ID: {client.id.toString().padStart(6, '0')}</p>
-                    <p style={{ margin: '5px 0', fontSize: '12px' }}>Usuário: <b>{client.name}</b></p>
-                    <p style={{ margin: '0', fontSize: '12px', color: 'darkblue' }}>Valor Devido: R$ {client.amount.toFixed(2)}</p>
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                    <p style={{ fontSize: '11px' }}>Selecione o método de pagamento para concluir:</p>
-                    <button 
-                        class="btn" 
-                        onClick={handlePixPayment}
-                        disabled={loading}
-                        style={{ width: '200px', height: '40px', fontWeight: 'bold' }}
-                    >
-                        {loading ? 'Processando...' : 'Pagar via PIX'}
-                    </button>
-                    <button 
-                        class="btn" 
-                        onClick={handlePayInPerson}
-                        style={{ width: '200px', height: '40px' }}
-                    >
-                        Pagar Pessoalmente
-                    </button>
-                </div>
-
-                {showPix && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div class="window" style={{ maxWidth: '300px' }}>
-                            <div class="title-bar">
-                                <div class="title-bar-text">PIX Payment Information</div>
-                                <div class="title-bar-controls">
-                                    <button onClick={() => setShowPix(false)}>×</button>
-                                </div>
-                            </div>
-                            <div class="window-body" style={{ textAlign: 'center' }}>
-                                <div style={{ border: '2px inset', backgroundColor: 'white', padding: '10px', display: 'inline-block' }}>
-                                    <img src={`data:image/png;base64,${pixData.qrcode}`} width="200" height="200" alt="QR Code" />
-                                </div>
-                                <p style={{ fontSize: '10px', marginTop: '10px' }}>Copie o código abaixo se necessário:</p>
-                                <button class="btn" style={{ fontSize: '10px', width: '100%' }} onClick={() => navigator.clipboard.writeText(pixData.payload)}>
-                                    Copiar Payload PIX
+                <div className="modern-card">
+                    <div className="bg-slate-900 text-white px-8 py-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <CreditCard size={16} className="text-blue-400" />
+                                Checkout Seguro
+                            </span>
+                            <div className="flex gap-2">
+                                <button onClick={() => handleSystemControl('close')} className="text-slate-500 hover:text-white transition-colors">
+                                    <X size={18} />
                                 </button>
-                                <p style={{ fontSize: '10px', color: 'darkblue', marginTop: '10px' }}>Aguardando confirmação do sistema...</p>
                             </div>
+                        </div>
+
+                        <div className="space-y-1">
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Valor a Pagar</p>
+                            <h2 className="text-4xl font-black">R$ {client.amount.toFixed(2)}</h2>
                         </div>
                     </div>
-                )}
-            </div>
 
-            {modal === 'playful' && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-                }}>
-                    <div class="window" style={{ maxWidth: '400px', width: '100%' }}>
-                        <div class="title-bar">
-                            <div class="title-bar-text">{playfulContent.title}</div>
-                            <div class="title-bar-controls">
-                                <button aria-label="Close" onClick={() => setModal(null)}>×</button>
+                    <div className="p-8">
+                        <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 mb-8">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Resumo do Pedido</h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-500 text-sm font-medium">Participante</span>
+                                    <span className="text-slate-900 font-bold text-sm">{client.name}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-500 text-sm font-medium">ID da Transação</span>
+                                    <span className="text-slate-900 font-mono text-xs">#{client.id.toString().padStart(6, '0')}</span>
+                                </div>
+                                <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
+                                    <span className="text-slate-900 font-bold text-sm flex items-center gap-1.5">
+                                        <ShieldCheck size={16} className="text-emerald-500" />
+                                        Garantia de Sorte
+                                    </span>
+                                    <span className="text-emerald-600 font-black text-sm">Ativa</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="window-body">
-                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                                <div style={{ 
-                                    width: '48px', height: '48px', background: '#e81123', borderRadius: '50%', 
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', 
-                                    fontSize: '32px', fontWeight: 'bold', flexShrink: 0 
-                                }}>!</div>
-                                <p style={{ textAlign: 'left', fontSize: '12px', lineHeight: '1.4', margin: 0 }}>
-                                    {playfulContent.message}
-                                </p>
+
+                        <div className="space-y-4">
+                            <p className="text-center text-sm text-slate-500 font-medium mb-2">Conclua seu pagamento para garantir os bilhetes:</p>
+                            
+                            <button 
+                                onClick={handlePixPayment}
+                                disabled={loading}
+                                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white p-5 rounded-2xl flex items-center justify-between transition-all shadow-lg shadow-emerald-500/20 group active:scale-[0.98] disabled:opacity-50"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-white/20 p-2 rounded-xl">
+                                        <QrCode size={24} />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-black text-lg leading-none">Pagar com PIX</p>
+                                        <p className="text-xs text-emerald-100 mt-1">Liberação instantânea dos bilhetes</p>
+                                    </div>
+                                </div>
+                                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="mt-8 text-center text-slate-400 text-xs font-medium flex items-center justify-center gap-2">
+                    <ShieldCheck size={14} /> Pagamento processado com segurança por Asaas
+                </p>
+            </div>
+
+            {/* PIX Modal */}
+            {showPix && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md animate-fade-in">
+                    <div className="modern-card w-full max-w-sm overflow-hidden">
+                        <div className="bg-slate-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+                            <span className="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <QrCode size={16} className="text-emerald-500" />
+                                Pagamento PIX
+                            </span>
+                            <button onClick={() => setShowPix(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-8 text-center">
+                            <div className="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm inline-block mb-6">
+                                <img src={`data:image/png;base64,${pixData.qrcode}`} width="220" height="220" alt="QR Code" className="rounded-xl" />
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <button class="btn" onClick={() => setModal(null)} style={{ width: '100px', fontWeight: 'bold' }}>OK</button>
+                            
+                            <div className="space-y-4">
+                                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                                    Escaneie o código com o app do seu banco ou copie a chave abaixo:
+                                </p>
+                                
+                                <button 
+                                    onClick={copyToClipboard}
+                                    className={`w-full p-4 rounded-xl border-2 flex items-center justify-center gap-3 font-bold transition-all ${
+                                        copied 
+                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white hover:border-blue-400'
+                                    }`}
+                                >
+                                    {copied ? (
+                                        <>
+                                            <CheckCircle2 size={18} />
+                                            Copiado!
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Copy size={18} />
+                                            Copiar Código PIX
+                                        </>
+                                    )}
+                                </button>
+                                
+                                <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-100">
+                                    <Loader2 className="animate-spin text-blue-500" size={16} />
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                                        Aguardando confirmação...
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Playful Alert Modal */}
+            {modal === 'playful' && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div className="modern-card w-full max-w-xs p-6 text-center">
+                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle size={40} />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">{playfulContent.title}</h3>
+                        <p className="text-sm text-slate-600 leading-relaxed mb-6">
+                            {playfulContent.message}
+                        </p>
+                        <button className="btn-primary w-full" onClick={() => setModal(null)}>
+                            OK, Entendido
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
+    );
+}
+
+function ChevronRight({ size, className }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className={className}>
+            <path d="m9 18 6-6-6-6"/>
+        </svg>
     );
 }

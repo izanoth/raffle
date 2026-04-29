@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
+import { 
+    ArrowLeft, 
+    Search, 
+    CheckCircle2, 
+    Clock, 
+    CreditCard, 
+    User,
+    RefreshCw,
+    Download
+} from 'lucide-preact';
 import '@styles';
 
 export function List() {
     const { route } = useLocation();
     const [clients, setClients] = useState([]);
+    const [filter, setFilter] = useState('');
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !sessionStorage.getItem('admin')) {
@@ -42,83 +53,106 @@ export function List() {
         }
     };
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            sessionStorage.removeItem('admin');
-        }
-        route('/admin');
-    };
+    const filteredClients = clients.filter(c => 
+        c.name.toLowerCase().includes(filter.toLowerCase()) || 
+        c.email.toLowerCase().includes(filter.toLowerCase())
+    );
 
     return (
-        <div class="window" style={{ marginTop: '20px', width: '98%', maxWidth: '1000px' }}>
-            <div class="title-bar">
-                <div class="title-bar-text">Administração - Lista de Clientes</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize">_</button>
-                    <button aria-label="Maximize">口</button>
-                    <button aria-label="Close" onClick={() => route('/admin/panel')}>×</button>
+        <div className="min-h-screen bg-slate-50 py-8 px-4 animate-fade-in">
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <button 
+                            onClick={() => route('/admin/panel')}
+                            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold transition-colors mb-2"
+                        >
+                            <ArrowLeft size={18} />
+                            Voltar ao Painel
+                        </button>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Lista de Clientes</h1>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                        <button className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+                            <Download size={18} /> Exportar CSV
+                        </button>
+                        <button 
+                            onClick={fetchClients}
+                            className="bg-blue-600 px-4 py-2.5 rounded-xl text-white font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                        >
+                            <RefreshCw size={18} /> Sincronizar
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="window-body">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                    <button class="btn" onClick={() => route('/admin/panel')}>← Voltar ao Painel</button>
-                    <button class="btn" onClick={handleLogout} style={{ color: '#cc3000' }}>Logout</button>
-                </div>
+                <div className="modern-card">
+                    <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-4">
+                        <div className="relative flex-grow">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar por nome ou e-mail..."
+                                className="input-field pl-12"
+                                value={filter}
+                                onInput={(e) => setFilter(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 text-slate-500 text-sm font-bold whitespace-nowrap">
+                            <User size={16} /> {filteredClients.length} Participantes
+                        </div>
+                    </div>
 
-                <div class="fieldset">
-                    <span class="fieldset-label">Participantes Registrados</span>
-                    <div style={{ overflowX: 'auto', backgroundColor: '#fff', border: '1px inset', padding: '1px' }}>
-                        <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#ece9d8', borderBottom: '1px solid #707070', position: 'sticky', top: 0 }}>
+                    <div className="overflow-x-auto overflow-y-auto max-h-[70vh] custom-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 border-b border-slate-100 sticky top-0 z-10">
                                 <tr>
-                                    <th style={{ padding: '8px' }}>ID</th>
-                                    <th style={{ padding: '8px' }}>Data</th>
-                                    <th style={{ padding: '8px' }}>Nome</th>
-                                    <th style={{ padding: '8px' }}>Email/Telefone</th>
-                                    <th style={{ padding: '8px' }}>CPF</th>
-                                    <th style={{ padding: '8px' }}>Método</th>
-                                    <th style={{ padding: '8px' }}>Valor</th>
-                                    <th style={{ padding: '8px' }}>Status</th>
-                                    <th style={{ padding: '8px', textAlign: 'center' }}>Confirmar</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">ID / Data</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Participante</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Método</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Valor</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {clients.map(client => (
-                                    <tr key={client.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                        <td style={{ padding: '8px' }}>{client.id}</td>
-                                        <td style={{ padding: '8px' }}>{new Date(client.createdAt).toLocaleDateString()}</td>
-                                        <td style={{ padding: '8px', fontWeight: 'bold' }}>{client.name}</td>
-                                        <td style={{ padding: '8px' }}>
-                                            <div style={{ fontSize: '10px' }}>{client.email}</div>
-                                            <div style={{ fontSize: '10px', color: '#666' }}>{client.phone}</div>
+                            <tbody className="divide-y divide-slate-50">
+                                {filteredClients.map(client => (
+                                    <tr key={client.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <p className="font-mono text-xs text-slate-400">#{client.id.toString().padStart(5, '0')}</p>
+                                            <p className="text-[10px] font-bold text-slate-500 mt-0.5">{new Date(client.createdAt).toLocaleDateString()}</p>
                                         </td>
-                                        <td style={{ padding: '8px' }}>{client.cpf}</td>
-                                        <td style={{ padding: '8px' }}>{client.asaas_id ? 'PIX' : 'In Person'}</td>
-                                        <td style={{ padding: '8px' }}>R$ {client.amount.toFixed(2)}</td>
-                                        <td style={{ padding: '8px', fontWeight: 'bold', color: client.paid ? 'green' : '#ff8e00' }}>
-                                            {client.paid ? 'PAGO' : 'PENDENTE'}
+                                        <td className="px-6 py-4">
+                                            <p className="font-bold text-slate-900">{client.name}</p>
+                                            <p className="text-xs text-slate-400">{client.email} • {client.phone}</p>
                                         </td>
-                                        <td style={{ padding: '8px', textAlign: 'center' }}>
-                                            {!client.paid && (
-                                                <input 
-                                                    type="checkbox" 
-                                                    onChange={() => handleConfirmPayment(client.id)}
-                                                    style={{ cursor: 'pointer' }}
-                                                />
+                                        <td className="px-6 py-4 text-right font-black text-slate-900">
+                                            R$ {client.amount.toFixed(2)}
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            {client.paid ? (
+                                                <div className="flex items-center justify-center gap-1.5 text-emerald-600">
+                                                    <CheckCircle2 size={16} />
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Pago</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-center gap-1.5 text-amber-500">
+                                                    <Clock size={16} />
+                                                    <span className="font-bold text-xs uppercase tracking-wider">Aguardando PIX</span>
+                                                </div>
                                             )}
                                         </td>
                                     </tr>
                                 ))}
+                                {filteredClients.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-12 text-center text-slate-400 italic">
+                                            Nenhum cliente encontrado para os critérios de busca.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-            
-            <div class="taskbar" style={{ position: 'relative', marginTop: '10px', bottom: '0' }}>
-                <div style={{ marginLeft: 'auto', padding: '0 5px', fontSize: '11px' }}>
-                    Total de Participantes: {clients.length}
                 </div>
             </div>
         </div>

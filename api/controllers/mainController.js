@@ -78,7 +78,7 @@ export const getRaffleStatus = async (req, res) => {
         });
 
         res.json({
-            goal: 500,
+            goal: 52,
             totalSold: totalSold._sum.units || 0,
             participantsCount: clients.length,
             participants: maskedClients

@@ -5,6 +5,23 @@ import { Intro } from './components/Intro';
 import { Contract } from './components/Contract';
 import { Rules } from './components/Rules';
 import { Playful } from './components/Playful';
+import { 
+    Ticket, 
+    User, 
+    Mail, 
+    Phone, 
+    ChevronRight, 
+    Info, 
+    BarChart3, 
+    RefreshCw, 
+    ShieldCheck, 
+    Plus, 
+    Minus,
+    Clock,
+    X,
+    Maximize2,
+    MinusSquare
+} from 'lucide-preact';
 import '@styles';
 
 function SystemTimer() {
@@ -18,7 +35,7 @@ function SystemTimer() {
         return () => clearInterval(interval);
     }, []);
 
-    return <span>{timer}</span>;
+    return <span className="font-mono">{timer}</span>;
 }
 
 export function Home() {
@@ -53,16 +70,16 @@ export function Home() {
     const handleSystemControl = (type) => {
         const contents = {
             close: {
-                title: 'Acesso Negado',
-                message: 'ERRO 403: O botão de fechar foi desativado por questões de segurança. O sistema detectou que você ainda não garantiu sua chance de ganhar! Tentar sair agora pode causar "falta de sorte" crônica.'
+                title: 'Ação Bloqueada',
+                message: 'O sistema detectou uma tentativa de saída sem garantir sua sorte. Por motivos de "segurança mística", o botão de fechar foi temporariamente redirecionado para a persistência.'
             },
             minimize: {
-                title: 'Gerenciador de Janelas',
-                message: 'Atenção: Minimizar a sorte não é recomendado. Mantenha a janela aberta para que as vibrações positivas do servidor alcancem seu dispositivo.'
+                title: 'Modo Foco',
+                message: 'Minimizar a sorte não é suportado nesta versão. Mantenha a vibração positiva em tela cheia para melhores resultados.'
             },
             maximize: {
-                title: 'Ajuste de Resolução',
-                message: 'Otimizando para 8K... Brincadeira! Este sistema foi projetado para a resolução perfeita de 2001. Você já está vendo o ápice da tecnologia atual.'
+                title: 'Resolução Adaptativa',
+                message: 'O sistema já está operando na "Resolução da Sorte". Aumentar a janela não aumentará o prêmio, mas sua participação sim!'
             }
         };
         setPlayfulContent(contents[type]);
@@ -112,10 +129,10 @@ export function Home() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
-        if (!formData.name) newErrors.name = 'Erro: Nome obrigatório';
-        if (!formData.email) newErrors.email = 'Erro: E-mail obrigatório';
-        if (!formData.phone) newErrors.phone = 'Erro: WhatsApp obrigatório';
-        if (!formData.terms) newErrors.terms = 'Erro: Aceite obrigatório';
+        if (!formData.name) newErrors.name = 'Nome é obrigatório';
+        if (!formData.email) newErrors.email = 'E-mail é obrigatório';
+        if (!formData.phone) newErrors.phone = 'WhatsApp é obrigatório';
+        if (!formData.terms) newErrors.terms = 'Você precisa aceitar os termos';
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -144,215 +161,306 @@ export function Home() {
     };
 
     return (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>          
-            {/* Form Window */}
-            {activeWindow === 'form' && (
-                <div class="window">
-                    <div class="title-bar">
-                        <div class="title-bar-text">Rifa do Ivan - Participar</div>
-                        <div class="title-bar-controls">
-                            <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
-                            <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
-                            <button aria-label="Close" onClick={() => handleSystemControl('close')}>×</button>
+        <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
+            {/* Main Container */}
+            <div className="w-full max-w-xl animate-fade-in">
+                
+                {/* Modern Header Area */}
+                <div className="mb-8 flex flex-col md:flex-row items-center gap-6 bg-white/40 backdrop-blur-sm p-6 rounded-3xl border border-white/60">
+                    <div className="w-20 h-20 bg-white rounded-2xl shadow-lg border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 group hover:rotate-3 transition-transform">
+                        <img src="/img/rifadoivan.png" alt="Rifa do Ivan" className="w-full h-full object-cover" />
+                    </div>
+                    
+                    <div className="flex-grow text-center md:text-left">
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Rifa do Ivan</h1>
+                        <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-2">
+                            <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                                <Clock size={12} /> <SystemTimer />
+                            </span>
+                            <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">
+                                <ShieldCheck size={12} /> 100% Seguro
+                            </span>
                         </div>
                     </div>
 
-                    <div class="window-body">
-                        <div class="header-layout">
-                            {/* Logo integrado - Height dynamically stretches to match fieldset */}
-                            <div class="logo-box">
-                                <img src="/img/rifadoivan.png" alt="Rifa do Ivan" />
-                            </div>
-
-                            <div class="header-info">
-                                <div class="fieldset" style={{ marginBottom: 0 }}>
-                                    <span class="fieldset-label">Status do Sistema</span>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '5px' }}>
-                                        <div>
-                                            <p style={{ margin: '0', fontSize: '11px' }}>Processamento ativo // <SystemTimer /></p>
-                                            <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'blue' }}>Prêmio: 50% do Arrecadado</p>
-                                            <p style={{ margin: '3px 0 0 0', fontSize: '11px' }}>
-                                                <a href="#" onClick={openRules} style={{ color: 'blue', textDecoration: 'underline' }}>Regras do sorteio</a>
-                                            </p>
-                                        </div>
-                                        <button type="button" class="btn" onClick={openStatus} style={{ fontWeight: 'bold', fontSize: '10px', padding: '5px' }}>Ver Status</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleSubmit}>
-                            <div class="mb-3">
-                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>Nome:</label>
-                                <input
-                                    class="form-control"
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onInput={handleChange}
-                                    autoComplete="name"
-                                    required
-                                />
-                                {errors.name && <p class="error-text">{errors.name}</p>}
-                            </div>
-
-                            <div class="mb-3">
-                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>E-mail:</label>
-                                <input
-                                    class="form-control"
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onInput={handleChange}
-                                    autoComplete="email"
-                                    required
-                                />
-                                {errors.email && <p class="error-text">{errors.email}</p>}
-                            </div>
-
-                            <div class="mb-3">
-                                <label style={{ display: 'block', fontSize: '11px', marginBottom: '3px' }}>WhatsApp/Celular:</label>
-                                <input
-                                    class="form-control"
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onInput={handleChange}
-                                    placeholder="(00) 00000-0000"
-                                    autoComplete="tel"
-                                    inputMode="tel"
-                                    required
-                                />
-                                {errors.phone && <p class="error-text">{errors.phone}</p>}
-                            </div>
-
-                            <div class="fieldset">
-                                <span class="fieldset-label">Configuração de Bilhetes</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <button type="button" class="btn" onClick={() => handleUnitChange(-1)}>-</button>
-                                    <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{formData.units}</span>
-                                    <button type="button" class="btn" onClick={() => handleUnitChange(1)}>+</button>
-                                    <span style={{ marginLeft: 'auto', fontWeight: 'bold' }}>R$ {(formData.units * 5).toFixed(2)}</span>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', margin: '15px 0' }}>
-                                <input
-                                    type="checkbox"
-                                    name="terms"
-                                    id="terms"
-                                    checked={formData.terms}
-                                    onChange={handleChange}
-                                />
-                                <label for="terms" style={{ fontSize: '11px', marginLeft: '5px' }}>
-                                    Aceito os <a href="#" onClick={openContract} style={{ color: 'blue', textDecoration: 'underline' }}>termos do contrato digital</a>.
-                                </label>
-                            </div>
-
-                            {errors.submit && <p class="error-text" style={{ fontSize: '12px', marginBottom: '10px' }}>{errors.submit}</p>}
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '5px' }}>
-                                <button class="btn" type="submit" disabled={!formData.terms}>OK</button>
-                                <button class="btn" type="button" onClick={() => handleSystemControl('close')}>Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
+                    <button 
+                        onClick={openStatus}
+                        className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+                    >
+                        <BarChart3 size={16} />
+                        Status
+                    </button>
                 </div>
-            )}
 
-            {/* Status Window */}
-            {activeWindow === 'status' && (
-                <div class="window">
-                    <div class="title-bar">
-                        <div class="title-bar-text">Status da Rifa do Ivan</div>
-                        <div class="title-bar-controls">
-                            <button aria-label="Minimize" onClick={() => handleSystemControl('minimize')}>_</button>
-                            <button aria-label="Maximize" onClick={() => handleSystemControl('maximize')}>口</button>
-                            <button aria-label="Close" onClick={() => setActiveWindow('form')}>×</button>
+                {activeWindow === 'form' ? (
+                    <div className="modern-card animate-fade-in">
+                        {/* Fake Window Controls (Modern) */}
+                        <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-3 flex justify-between items-center">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <Ticket size={14} className="text-blue-500" />
+                                Participar do Sorteio
+                            </span>
+                            <div className="flex gap-2">
+                                <button onClick={() => handleSystemControl('minimize')} className="w-6 h-6 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400"><MinusSquare size={14} /></button>
+                                <button onClick={() => handleSystemControl('maximize')} className="w-6 h-6 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400"><Maximize2 size={14} /></button>
+                                <button onClick={() => handleSystemControl('close')} className="w-6 h-6 rounded-full hover:bg-red-100 hover:text-red-500 flex items-center justify-center text-slate-400 transition-colors"><X size={14} /></button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="window-body">
-                        {loadingStatus ? (
-                            <p style={{ textAlign: 'center', padding: '20px' }}>Carregando dados...</p>
-                        ) : raffleStatus ? (
-                            <div>
-                                <div class="fieldset">
-                                    <span class="fieldset-label">Progresso Geral</span>
-                                    <div style={{ marginBottom: '10px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '5px' }}>
-                                            <span>Objetivo: {raffleStatus.goal} bilhetes</span>
-                                            <span>{raffleStatus.totalSold} vendidos</span>
-                                        </div>
-                                        <div style={{ height: '15px', backgroundColor: '#fff', border: '1px solid #707070', padding: '1px' }}>
-                                            <div style={{ 
-                                                height: '100%', 
-                                                backgroundColor: '#0055e5', 
-                                                width: `${Math.min(100, (raffleStatus.totalSold / raffleStatus.goal) * 100)}%`,
-                                                transition: 'width 0.5s ease'
-                                            }} />
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="fieldset">
-                                    <span class="fieldset-label">Últimos Participantes</span>
-                                    <div style={{ maxHeight: '200px', overflowY: 'auto', backgroundColor: '#fff', border: '1px inset' }}>
-                                        <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
-                                            <thead style={{ position: 'sticky', top: 0, background: 'var(--win-gray)', borderBottom: '1px solid #707070' }}>
-                                                <tr>
-                                                    <th style={{ textAlign: 'left', padding: '5px' }}>Email</th>
-                                                    <th style={{ textAlign: 'left', padding: '5px' }}>Tel</th>
-                                                    <th style={{ textAlign: 'right', padding: '5px' }}>Bilhetes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {raffleStatus.participants.map((p, i) => (
-                                                    <tr key={i} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                                                        <td style={{ padding: '5px' }}>{p.email}</td>
-                                                        <td style={{ padding: '5px' }}>{p.phone}</td>
-                                                        <td style={{ padding: '5px', textAlign: 'right' }}>{p.units}</td>
-                                                    </tr>
-                                                ))}
-                                                {raffleStatus.participants.length === 0 && (
-                                                    <tr>
-                                                        <td colspan="3" style={{ textAlign: 'center', padding: '10px' }}>Nenhum participante ainda. Seja o primeiro!</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                        <div className="p-8">
+                            <div className="mb-8 p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-4">
+                                <div className="bg-blue-600 p-2 rounded-xl text-white">
+                                    <Info size={20} />
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
-                                    <button class="btn" onClick={fetchStatus} style={{ minWidth: '100px' }}>Atualizar</button>
-                                    <button class="btn" onClick={openParticipar} style={{ minWidth: '100px' }}>Voltar</button>
+                                <div>
+                                    <h4 className="text-sm font-bold text-blue-900">Prêmio: 50% do Arrecadado</h4>
+                                    <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
+                                        Participe e ajude o Ivan em seus estudos. <a href="#" onClick={openRules} className="underline font-bold">Ver regras do sorteio</a>.
+                                    </p>
                                 </div>
                             </div>
-                        ) : (
-                            <p style={{ textAlign: 'center', padding: '20px' }}>Erro ao carregar dados.</p>
-                        )}
-                    </div>
-                </div>
-            )}
 
-            {/* Modals */}
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <div className="grid md:grid-cols-1 gap-5">
+                                    <div>
+                                        <label className="label-text">Nome Completo</label>
+                                        <div className="relative">
+                                            <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                            <input
+                                                className="input-field"
+                                                type="text"
+                                                name="name"
+                                                placeholder="Como quer ser chamado?"
+                                                value={formData.name}
+                                                onInput={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                        {errors.name && <p className="text-xs text-red-500 mt-1.5 ml-1 font-medium">{errors.name}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label className="label-text">E-mail</label>
+                                        <div className="relative">
+                                            <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                            <input
+                                                className="input-field"
+                                                type="email"
+                                                name="email"
+                                                placeholder="seu@email.com"
+                                                value={formData.email}
+                                                onInput={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                        {errors.email && <p className="text-xs text-red-500 mt-1.5 ml-1 font-medium">{errors.email}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label className="label-text">WhatsApp</label>
+                                        <div className="relative">
+                                            <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
+                                            <input
+                                                className="input-field"
+                                                type="tel"
+                                                name="phone"
+                                                placeholder="(00) 00000-0000"
+                                                value={formData.phone}
+                                                onInput={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                        {errors.phone && <p className="text-xs text-red-500 mt-1.5 ml-1 font-medium">{errors.phone}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                    <label className="label-text mb-4">Quantidade de Bilhetes</label>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                                            <button 
+                                                type="button" 
+                                                onClick={() => handleUnitChange(-1)}
+                                                className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors"
+                                            >
+                                                <Minus size={18} />
+                                            </button>
+                                            <span className="text-lg font-black text-slate-900 w-8 text-center">{formData.units}</span>
+                                            <button 
+                                                type="button" 
+                                                onClick={() => handleUnitChange(1)}
+                                                className="w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center text-white transition-colors shadow-md shadow-blue-200"
+                                            >
+                                                <Plus size={18} />
+                                            </button>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Total</p>
+                                            <p className="text-2xl font-black text-blue-600">R$ {(formData.units * 5).toFixed(2)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-3 py-2">
+                                    <div className="relative flex items-center mt-1">
+                                        <input
+                                            type="checkbox"
+                                            name="terms"
+                                            id="terms"
+                                            className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                                            checked={formData.terms}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <label htmlFor="terms" className="text-sm text-slate-600 leading-snug cursor-pointer">
+                                        Eu li e aceito os <a href="#" onClick={openContract} className="text-blue-600 font-bold hover:underline">termos do contrato digital</a> de participação.
+                                    </label>
+                                </div>
+
+                                {errors.submit && (
+                                    <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
+                                        {errors.submit}
+                                    </div>
+                                )}
+
+                                <button 
+                                    className="btn-primary w-full flex items-center justify-center gap-2 text-lg py-4" 
+                                    type="submit" 
+                                    disabled={!formData.terms}
+                                >
+                                    Garantir minha Sorte
+                                    <ChevronRight size={20} />
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="modern-card animate-fade-in">
+                        <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <BarChart3 size={18} className="text-blue-500" />
+                                Status da Rifa
+                            </h2>
+                            <button 
+                                onClick={openParticipar}
+                                className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm"
+                            >
+                                Voltar
+                            </button>
+                        </div>
+
+                        <div className="p-8">
+                            {loadingStatus ? (
+                                <div className="py-12 flex flex-col items-center justify-center gap-4">
+                                    <RefreshCw className="text-blue-500 animate-spin" size={32} />
+                                    <p className="text-slate-500 font-medium">Sincronizando dados...</p>
+                                </div>
+                            ) : raffleStatus ? (
+                                <div className="space-y-8">
+                                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                        <div className="flex justify-between items-end mb-4">
+                                            <div>
+                                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Progresso</p>
+                                                <h3 className="text-3xl font-black text-slate-900">
+                                                    {raffleStatus.totalSold} <span className="text-lg text-slate-400 font-medium">/ {raffleStatus.goal}</span>
+                                                </h3>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-2xl font-black text-blue-600">
+                                                    {Math.round((raffleStatus.totalSold / raffleStatus.goal) * 100)}%
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="h-4 bg-white rounded-full border border-slate-200 p-1 overflow-hidden shadow-inner">
+                                            <div 
+                                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out shadow-sm"
+                                                style={{ width: `${Math.min(100, (raffleStatus.totalSold / raffleStatus.goal) * 100)}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4 ml-1">Últimos Participantes</h4>
+                                        <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                <table className="w-full text-sm text-left">
+                                                    <thead className="bg-slate-50 text-slate-400 font-bold text-[10px] uppercase tracking-widest sticky top-0">
+                                                        <tr>
+                                                            <th className="px-6 py-4">Participante</th>
+                                                            <th className="px-6 py-4 text-right">Bilhetes</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-50">
+                                                        {raffleStatus.participants.map((p, i) => (
+                                                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                                <td className="px-6 py-4">
+                                                                    <p className="font-bold text-slate-900 truncate max-w-[180px]">{p.email}</p>
+                                                                    <p className="text-[10px] text-slate-400">{p.phone}</p>
+                                                                </td>
+                                                                <td className="px-6 py-4 text-right">
+                                                                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-black">
+                                                                        {p.units}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {raffleStatus.participants.length === 0 && (
+                                                            <tr>
+                                                                <td colSpan="2" className="px-6 py-12 text-center text-slate-400 italic">
+                                                                    Ninguém por aqui ainda. Seja o pioneiro!
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-4">
+                                        <button className="btn-secondary flex-grow flex items-center justify-center gap-2" onClick={fetchStatus}>
+                                            <RefreshCw size={18} />
+                                            Atualizar
+                                        </button>
+                                        <button className="btn-primary flex-grow" onClick={openParticipar}>
+                                            Participar Agora
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="py-12 text-center">
+                                    <p className="text-red-500 font-medium">Erro ao carregar dados.</p>
+                                    <button className="mt-4 text-blue-600 font-bold" onClick={fetchStatus}>Tentar novamente</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Footer Info */}
+                <p className="mt-8 text-center text-slate-400 text-xs font-medium">
+                    © 2024 Rifa do Ivan • Desenvolvido com foco e propósito
+                </p>
+            </div>
+
+            {/* Modern Modal System */}
             {modal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
-                }}>
-                    <div class="window" style={{ maxWidth: (modal === 'playful' || modal === 'intro') ? '320px' : '600px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-                        <div class="title-bar">
-                            <div class="title-bar-text">
-                                {modal === 'intro' ? 'Mensagem do Sistema' : 
-                                 modal === 'contract' ? 'Contrato de Participação' : 
-                                 modal === 'rules' ? 'Regras do Sorteio' : playfulContent.title}
-                            </div>
-                            <div class="title-bar-controls">
-                                <button aria-label="Close" onClick={() => setModal(null)}>×</button>
-                            </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div className={`modern-card w-full max-h-[90vh] flex flex-col ${
+                        (modal === 'playful' || modal === 'intro') ? 'max-w-xs' : 'max-w-2xl'
+                    }`}>
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                                {modal === 'intro' ? 'Sistema' : 
+                                 modal === 'contract' ? 'Contrato' : 
+                                 modal === 'rules' ? 'Regras' : 'Aviso'}
+                            </span>
+                            <button onClick={() => setModal(null)} className="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 transition-colors">
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div class="window-body" style={{ overflowY: 'auto', flex: 1 }}>
+                        <div className="overflow-y-auto flex-1">
                             {modal === 'playful' ? (
                                 <Playful content={playfulContent} onClose={() => setModal(null)} />
                             ) : modal === 'intro' ? (

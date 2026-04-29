@@ -12,10 +12,13 @@
 	"dependencies": {
 		"@prisma/adapter-pg": "^7.4.2",
 		"@prisma/client": "^5.18.0",
+		"@tailwindcss/postcss": "^4.2.4",
+		"@tailwindcss/vite": "^4.2.4",
 		"@vercel/analytics": "^2.0.0",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.7",
 		"express": "^4.21.2",
+		"lucide-preact": "^1.14.0",
 		"node-fetch": "^3.3.2",
 		"preact": "^10.26.9",
 		"preact-iso": "^2.11.1",
@@ -24,10 +27,13 @@
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.10.2",
+		"autoprefixer": "^10.5.0",
 		"concurrently": "^9.1.2",
 		"eslint": "^9.39.3",
 		"eslint-config-preact": "^2.0.0",
 		"nodemon": "^3.1.9",
+		"postcss": "^8.5.12",
+		"tailwindcss": "^4.2.4",
 		"vite": "^7.0.4"
 	},
 	"eslintConfig": {

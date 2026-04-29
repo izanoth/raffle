@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
+import { 
+    Users, 
+    Zap, 
+    Trophy, 
+    TrendingUp, 
+    LogOut, 
+    ChevronRight,
+    Loader2,
+    Calendar,
+    Hash,
+    FileText,
+    RefreshCw
+} from 'lucide-preact';
 import '@styles';
 
 export function Panel() {
@@ -44,17 +57,17 @@ export function Panel() {
             });
             const data = await response.json();
             if (data.success) {
-                // Start "Peão" animation
                 setIsSpinning(true);
                 let count = 0;
                 const interval = setInterval(() => {
                     setDisplayNumber(Math.floor(1000 + Math.random() * 9000).toString());
                     count += 50;
-                    if (count >= 4000) { // 4 seconds of suspense
+                    if (count >= 4000) { 
                         clearInterval(interval);
                         setIsSpinning(false);
                         setWinner(data.winner);
                         setDisplayNumber(data.winner.ticket);
+                        setLoadingDraw(false);
                     }
                 }, 50);
             } else {
@@ -68,123 +81,159 @@ export function Panel() {
         }
     };
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            sessionStorage.removeItem('admin');
-        }
-        route('/admin');
-    };
-
     return (
-        <div class="window" style={{ marginTop: '20px', maxWidth: '600px', width: '100%' }}>
-            <div class="title-bar">
-                <div class="title-bar-text">Administração - Painel de Controle</div>
-                <div class="title-bar-controls">
-                    <button aria-label="Minimize">_</button>
-                    <button aria-label="Maximize">口</button>
-                    <button aria-label="Close" onClick={handleLogout}>×</button>
-                </div>
-            </div>
-
-            <div class="window-body">
-                <div class="fieldset">
-                    <span class="fieldset-label">Status Geral do Sistema</span>
-                    <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse', backgroundColor: '#fff', border: '1px inset' }}>
-                        <tbody>
-                            <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                <td style={{ padding: '8px' }}>Total de Registros:</td>
-                                <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>{stats.registers}</td>
-                            </tr>
-                            <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                <td style={{ padding: '8px' }}>Pagamentos Confirmados:</td>
-                                <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: 'green' }}>{stats.payments}</td>
-                            </tr>
-                            <tr style={{ backgroundColor: '#f9f9f9' }}>
-                                <td style={{ padding: '8px' }} colspan="2"><b>Intenções PIX (Asaas):</b></td>
-                            </tr>
-                            <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                <td style={{ padding: '8px', paddingLeft: '20px' }}>Pendentes no Asaas:</td>
-                                <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>{stats.asaasIntents}</td>
-                            </tr>
-                            <tr>
-                                <td style={{ padding: '8px', fontWeight: 'bold' }}>Total Geral de Intenções:</td>
-                                <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold', color: 'blue' }}>{stats.totalIntents}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Sorteio Suspension/Winner Display */}
-                {(isSpinning || winner) && (
-                    <div class="fieldset" style={{ 
-                        border: '3px solid #ff8e00', 
-                        backgroundColor: '#fff', 
-                        textAlign: 'center',
-                        padding: '20px',
-                        boxShadow: 'inset 0 0 15px rgba(255,142,0,0.2)'
-                    }}>
-                        <span class="fieldset-label" style={{ color: '#ff8e00' }}>
-                            {isSpinning ? '⚠️ SORTEANDO... ⚠️' : '🎉 RESULTADO FINAL 🎉'}
-                        </span>
-                        
-                        <div style={{ margin: '15px 0' }}>
-                            <div style={{ 
-                                fontSize: '64px', 
-                                fontWeight: '900', 
-                                color: isSpinning ? '#777' : '#cc3000',
-                                fontFamily: "'Courier New', Courier, monospace",
-                                letterSpacing: '8px',
-                                textShadow: isSpinning ? 'none' : '2px 2px 0px #000',
-                                display: 'inline-block',
-                                padding: '10px 20px',
-                                border: '4px double #777',
-                                backgroundColor: isSpinning ? '#f0f0f0' : '#ffff99'
-                            }}>
-                                {displayNumber}
-                            </div>
-                        </div>
-
-                        {winner && !isSpinning && (
-                            <div style={{ 
-                                animation: 'winnerReveal 0.5s ease-out forwards',
-                                opacity: 0,
-                                transform: 'translateY(10px)'
-                            }}>
-                                <p style={{ fontSize: '18px', margin: '5px 0', fontWeight: 'bold' }}>GANHADOR(A): {winner.name}</p>
-                                <p style={{ fontSize: '13px', color: '#666', margin: '2px 0' }}>ID: {winner.clientId.toString().padStart(6, '0')}</p>
-                                <p style={{ fontSize: '12px', color: '#444', fontStyle: 'italic' }}>Contato: {winner.phone}</p>
-                            </div>
-                        )}
-                        
-                        <style>{`
-                            @keyframes winnerReveal {
-                                to { opacity: 1; transform: translateY(0); }
-                            }
-                        `}</style>
+        <div className="min-h-screen bg-slate-50 py-8 px-4 animate-fade-in">
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-8 flex justify-between items-end">
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Painel Administrativo</h1>
+                        <p className="text-slate-500 font-medium">Bem-vindo, {typeof window !== 'undefined' ? sessionStorage.getItem('admin') : 'Admin'}</p>
                     </div>
-                )}
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
-                    <button class="btn" onClick={() => route('/admin/list')} style={{ minWidth: '120px' }}>Lista de Clientes</button>
-                    <button class="btn" onClick={() => route('/admin/hasher')} style={{ minWidth: '120px' }}>Gerador de Hash</button>
-                    <button class="btn" onClick={() => route('/admin/success-preview')} style={{ minWidth: '120px' }}>Gerar Comprovante</button>
                     <button 
-                        class="btn" 
-                        onClick={handleDraw} 
-                        disabled={loadingDraw}
-                        style={{ minWidth: '150px', fontWeight: 'bold', backgroundColor: '#ff8e00', border: '1px solid #cc3000' }}
+                        onClick={fetchStats}
+                        className="bg-white border border-slate-200 p-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
                     >
-                        {loadingDraw ? 'Sorteando...' : 'REALIZAR SORTEIO'}
+                        <RefreshCw size={20} />
                     </button>
-                    <button class="btn" onClick={handleLogout} style={{ minWidth: '120px', color: '#cc3000' }}>Encerrar Sessão</button>
                 </div>
-            </div>
-            
-            <div class="taskbar" style={{ position: 'relative', marginTop: '10px', bottom: '0' }}>
-                <div style={{ marginLeft: 'auto', padding: '0 5px', fontSize: '11px' }}>
-                    Admin Mode v1.2
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <StatCard 
+                        title="Total de Registros" 
+                        value={stats.registers} 
+                        icon={<Users className="text-blue-500" />} 
+                        color="bg-blue-50"
+                    />
+                    <StatCard 
+                        title="Pagamentos Confirmados" 
+                        value={stats.payments} 
+                        icon={<Zap className="text-emerald-500" />} 
+                        color="bg-emerald-50"
+                        highlight="text-emerald-600"
+                    />
+                    <StatCard 
+                        title="Pendentes Asaas" 
+                        value={stats.asaasIntents} 
+                        icon={<TrendingUp className="text-amber-500" />} 
+                        color="bg-amber-50"
+                    />
+                    <StatCard 
+                        title="Total de Intenções" 
+                        value={stats.totalIntents} 
+                        icon={<Calendar className="text-indigo-500" />} 
+                        color="bg-indigo-50"
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Sorteio Card */}
+                    <div className="lg:col-span-2 modern-card p-8 bg-slate-900 text-white relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+                        
+                        <div className="relative z-10 h-full flex flex-col">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="bg-blue-600 p-2 rounded-xl">
+                                    <Trophy size={24} className="text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black">Realizar Sorteio</h3>
+                                    <p className="text-slate-400 text-sm">Selecione aleatoriamente um ganhador entre os pagos</p>
+                                </div>
+                            </div>
+
+                            <div className="flex-grow flex flex-col items-center justify-center py-12">
+                                <div className={`text-6xl md:text-8xl font-black font-mono tracking-widest mb-8 p-8 rounded-3xl border-4 ${
+                                    isSpinning ? 'border-slate-700 text-slate-700 animate-pulse' : 'border-blue-500 text-blue-400 shadow-2xl shadow-blue-500/20'
+                                } bg-slate-800/50`}>
+                                    {displayNumber}
+                                </div>
+
+                                {winner && !isSpinning && (
+                                    <div className="text-center animate-fade-in space-y-2">
+                                        <p className="text-emerald-400 font-black text-2xl uppercase tracking-widest mb-4">🏆 Ganhador Encontrado! 🏆</p>
+                                        <h4 className="text-3xl font-black">{winner.name}</h4>
+                                        <p className="text-slate-400 font-mono">ID: {winner.clientId.toString().padStart(6, '0')} | Tel: {winner.phone}</p>
+                                    </div>
+                                )}
+
+                                {!isSpinning && !winner && (
+                                    <div className="text-center text-slate-500 max-w-sm italic">
+                                        Aguardando comando para iniciar o sorteio digital.
+                                    </div>
+                                )}
+                            </div>
+
+                            <button 
+                                onClick={handleDraw}
+                                disabled={loadingDraw}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 mt-4 flex items-center justify-center gap-3 text-lg"
+                            >
+                                {loadingDraw ? (
+                                    <><Loader2 className="animate-spin" /> Sorteando...</>
+                                ) : (
+                                    <><Zap size={24} /> REALIZAR SORTEIO AGORA</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Navigation Actions */}
+                    <div className="space-y-4">
+                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Ações do Sistema</h4>
+                        <NavAction 
+                            icon={<Users className="text-blue-500" />} 
+                            title="Lista de Clientes" 
+                            desc="Ver todos os participantes e pagamentos"
+                            onClick={() => route('/admin/list')}
+                        />
+                        <NavAction 
+                            icon={<Hash className="text-indigo-500" />} 
+                            title="Gerador de Hash" 
+                            desc="Criar senhas criptografadas para admin"
+                            onClick={() => route('/admin/hasher')}
+                        />
+                        <NavAction 
+                            icon={<FileText className="text-emerald-500" />} 
+                            title="Gerar Comprovante" 
+                            desc="Emitir layout de comprovante manual"
+                            onClick={() => route('/admin/success-preview')}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+function StatCard({ title, value, icon, color, highlight = "text-slate-900" }) {
+    return (
+        <div className="modern-card p-6 flex items-center gap-5">
+            <div className={`w-14 h-14 ${color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                {icon}
+            </div>
+            <div>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{title}</p>
+                <p className={`text-3xl font-black ${highlight}`}>{value}</p>
+            </div>
+        </div>
+    );
+}
+
+function NavAction({ icon, title, desc, onClick }) {
+    return (
+        <button 
+            onClick={onClick}
+            className="w-full modern-card p-6 flex items-center gap-4 hover:border-blue-300 transition-all text-left group"
+        >
+            <div className="bg-slate-50 p-3 rounded-xl group-hover:bg-blue-50 transition-colors">
+                {icon}
+            </div>
+            <div className="flex-grow">
+                <h5 className="font-bold text-slate-900 leading-none mb-1.5">{title}</h5>
+                <p className="text-xs text-slate-500">{desc}</p>
+            </div>
+            <ChevronRight size={18} className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+        </button>
     );
 }
