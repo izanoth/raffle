@@ -514,7 +514,7 @@ export function Home() {
                                 {modal === 'intro' ? 'Sistema' : 
                                  modal === 'contract' ? 'Contrato' : 
                                  modal === 'rules' ? 'Regras' : 
-                                 modal === 'contact' ? 'Fale Conosco' : 'Aviso'}
+                                 modal === 'contact' ? 'Contato' : 'Aviso'}
                             </span>
                             <button onClick={() => setModal(null)} className="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 transition-colors">
                                 <X size={18} />

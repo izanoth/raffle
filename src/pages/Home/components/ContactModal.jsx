@@ -48,15 +48,15 @@ export function ContactModal({ onClose }) {
                 <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 size={32} />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 mb-2">Mensagem Enviada!</h3>
+                <h3 className="text-xl font-black text-slate-900 mb-2">Recebi sua mensagem!</h3>
                 <p className="text-slate-600 text-sm mb-8">
-                    Obrigado pelo contato. Responderei o mais breve possível no e-mail informado.
+                    Valeu pelo contato! Vou ler com atenção e te respondo o quanto antes no e-mail que você deixou.
                 </p>
                 <button 
                     onClick={onClose}
                     className="btn-primary w-full py-4 rounded-2xl"
                 >
-                    Fechar
+                    Voltar para a Rifa
                 </button>
             </div>
         );
@@ -65,22 +65,22 @@ export function ContactModal({ onClose }) {
     return (
         <div className="p-6 md:p-8">
             <div className="mb-8">
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight text-center">Contato</h2>
-                <p className="text-slate-500 text-sm text-center mt-2">
-                    Dúvidas, sugestões ou suporte? Mande uma mensagem.
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight text-center">Fale Comigo</h2>
+                <p className="text-slate-500 text-sm text-center mt-2 px-4">
+                    Teve alguma dúvida ou quer trocar uma ideia sobre o projeto? É só me mandar por aqui.
                 </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="label-text">Nome</label>
+                    <label className="label-text">Como posso te chamar?</label>
                     <div className="relative flex items-center">
                         <User size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                         <input
                             className="input-field"
                             type="text"
                             name="name"
-                            placeholder="Seu nome"
+                            placeholder="Seu nome ou apelido"
                             value={formData.name}
                             onInput={handleChange}
                             required
@@ -89,14 +89,14 @@ export function ContactModal({ onClose }) {
                 </div>
 
                 <div>
-                    <label className="label-text">E-mail</label>
+                    <label className="label-text">Seu melhor e-mail</label>
                     <div className="relative flex items-center">
                         <Mail size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                         <input
                             className="input-field"
                             type="email"
                             name="email"
-                            placeholder="seu@email.com"
+                            placeholder="Para eu te responder"
                             value={formData.email}
                             onInput={handleChange}
                             required
@@ -105,14 +105,14 @@ export function ContactModal({ onClose }) {
                 </div>
 
                 <div>
-                    <label className="label-text">Assunto (Opcional)</label>
+                    <label className="label-text">Sobre o que vamos falar?</label>
                     <div className="relative flex items-center">
                         <Tag size={18} className="absolute left-4 text-slate-400 pointer-events-none z-10" />
                         <input
                             className="input-field"
                             type="text"
                             name="subject"
-                            placeholder="Sobre o que quer falar?"
+                            placeholder="Dúvida, sugestão, suporte..."
                             value={formData.subject}
                             onInput={handleChange}
                         />
@@ -120,13 +120,13 @@ export function ContactModal({ onClose }) {
                 </div>
 
                 <div>
-                    <label className="label-text">Mensagem</label>
+                    <label className="label-text">Sua mensagem</label>
                     <div className="relative">
                         <MessageSquare size={18} className="absolute left-4 top-4 text-slate-400 pointer-events-none z-10" />
                         <textarea
                             className="input-field min-h-[120px] pt-3 px-11"
                             name="message"
-                            placeholder="Sua mensagem aqui..."
+                            placeholder="Pode escrever o que precisar aqui..."
                             value={formData.message}
                             onInput={handleChange}
                             required
@@ -137,7 +137,7 @@ export function ContactModal({ onClose }) {
                 {status === 'error' && (
                     <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-center gap-2">
                         <AlertCircle size={18} />
-                        {error}
+                        Opa, algo deu errado por aqui. Tenta de novo?
                     </div>
                 )}
 
@@ -146,7 +146,7 @@ export function ContactModal({ onClose }) {
                     type="submit" 
                     disabled={status === 'loading'}
                 >
-                    {status === 'loading' ? 'Enviando...' : 'Enviar Mensagem'}
+                    {status === 'loading' ? 'Enviando...' : 'Enviar'}
                     <Send size={18} />
                 </button>
             </form>
