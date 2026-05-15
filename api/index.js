@@ -5,12 +5,34 @@ import prisma from './db.js';
 import * as mainController from './controllers/mainController.js';
 import * as asaasController from './controllers/asaasController.js';
 import * as contactController from './controllers/contactController.js';
+import * as adminController from './controllers/adminController.js';
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Maintenance Middleware
+const maintenanceCheck = async (req, res, next) => {
+    if (req.path.startsWith('/api/admin') || req.path === '/api/health' || req.path === '/api/app-state' || req.path === '/api/maintenance') {
+        return next();
+    }
+    
+    try {
+        const config = await prisma.config.findUnique({
+            where: { key: 'maintenance_mode' }
+        });
+        if (config && config.value === 'true') {
+            return res.status(503).json({ error: 'Maintenance mode' });
+        }
+    } catch (error) {
+        console.error('Maintenance check error:', error);
+    }
+    next();
+};
+
+app.use(maintenanceCheck);
 
 // Simple logging middleware
 app.use((req, res, next) => {
@@ -24,7 +46,9 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 // Main Routes
 app.post('/api/register', mainController.register);
 app.get('/api/timer', mainController.getTimer);
+app.get('/api/app-state', mainController.getAppState);
 app.get('/api/raffle/status', mainController.getRaffleStatus);
+app.get('/api/raffle/finished', mainController.getFinishedRaffle);
 app.post('/api/contact', contactController.sendContact);
 
 // Asaas/PIX Routes
@@ -32,7 +56,7 @@ app.post('/api/asaas', asaasController.asyncAsaas);
 app.get('/api/asaas/polling', asaasController.polling);
 app.post('/api/asaas/webhook', asaasController.webhook);
 
-// Admin Routes (Simplified for demonstration)
+// Admin Routes
 app.post('/api/admin/login', (req, res) => {
     const { user, password } = req.body;
     if (user === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
@@ -42,73 +66,22 @@ app.post('/api/admin/login', (req, res) => {
     }
 });
 
-app.get('/api/admin/stats', async (req, res) => {
-    // Check for auth header in real app
-    const registers = await prisma.client.count();
-    const payments = await prisma.client.count({ where: { paid: 1 } });
-    const asaasIntents = await prisma.client.count({ where: { asaas_id: { not: null }, paid: 0 } });
-    
-    res.json({ registers, payments, asaasIntents, totalIntents: asaasIntents });
-});
+app.get('/api/admin/stats', adminController.getStats);
+app.get('/api/admin/clients', adminController.getClients);
+app.get('/api/admin/clients/export', adminController.exportClientsCSV);
+app.post('/api/admin/clients/:id/confirm-payment', adminController.confirmPayment);
 
-app.get('/api/admin/clients', async (req, res) => {
-    const clients = await prisma.client.findMany({
-        orderBy: { createdAt: 'desc' }
-    });
-    res.json(clients);
-});
+// Raffle Management
+app.get('/api/admin/raffles', adminController.getRaffles);
+app.post('/api/admin/raffles', adminController.createRaffle);
+app.put('/api/admin/raffles/:id', adminController.updateRaffle);
+app.delete('/api/admin/raffles/:id', adminController.deleteRaffle);
+app.post('/api/admin/raffles/:id/draw', adminController.drawRaffle);
 
-app.post('/api/admin/clients/:id/confirm-payment', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const client = await prisma.client.update({
-            where: { id: parseInt(id) },
-            data: { paid: 1 }
-        });
-        res.json({ success: true, client });
-    } catch (error) {
-        console.error('Error confirming payment:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-app.post('/api/admin/draw', async (req, res) => {
-    try {
-        const paidClients = await prisma.client.findMany({
-            where: { paid: 1 }
-        });
-
-        if (paidClients.length === 0) {
-            return res.status(400).json({ error: 'Nenhum pagamento confirmado para realizar o sorteio.' });
-        }
-
-        // Collect all tickets from paid clients
-        let allTickets = [];
-        paidClients.forEach(client => {
-            try {
-                const tickets = JSON.parse(client.tickets);
-                tickets.forEach(ticket => {
-                    allTickets.push({ ticket, clientId: client.id, name: client.name, email: client.email, phone: client.phone });
-                });
-            } catch (e) {
-                console.error('Error parsing tickets for client', client.id);
-            }
-        });
-
-        if (allTickets.length === 0) {
-            return res.status(400).json({ error: 'Nenhum bilhete válido encontrado.' });
-        }
-
-        // Pick a random ticket
-        const winnerIndex = Math.floor(Math.random() * allTickets.length);
-        const winner = allTickets[winnerIndex];
-
-        res.json({ success: true, winner });
-    } catch (error) {
-        console.error('Error during draw:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+// Maintenance Mode
+app.get('/api/admin/maintenance', adminController.getMaintenanceStatus);
+app.post('/api/admin/maintenance', adminController.toggleMaintenance);
+app.get('/api/maintenance', adminController.getMaintenanceStatus);
 
 // Export for Vercel
 export default app;

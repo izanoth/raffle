@@ -11,7 +11,10 @@ import {
     Calendar,
     Hash,
     FileText,
-    RefreshCw
+    RefreshCw,
+    Settings,
+    ToggleLeft,
+    ToggleRight
 } from 'lucide-preact';
 import '@styles';
 
@@ -23,6 +26,8 @@ export function Panel() {
         asaasIntents: 0,
         totalIntents: 0
     });
+    const [maintenance, setMaintenance] = useState(false);
+    const [loadingMaintenance, setLoadingMaintenance] = useState(false);
     const [winner, setWinner] = useState(null);
     const [loadingDraw, setLoadingDraw] = useState(false);
     const [isSpinning, setIsSpinning] = useState(false);
@@ -34,6 +39,7 @@ export function Panel() {
             return;
         }
         fetchStats();
+        fetchMaintenance();
     }, []);
 
     const fetchStats = async () => {
@@ -43,6 +49,35 @@ export function Panel() {
             setStats(data);
         } catch (error) {
             console.error('Error fetching stats:', error);
+        }
+    };
+
+    const fetchMaintenance = async () => {
+        try {
+            const response = await fetch('/api/admin/maintenance');
+            const data = await response.json();
+            setMaintenance(data.maintenance);
+        } catch (error) {
+            console.error('Error fetching maintenance status:', error);
+        }
+    };
+
+    const handleToggleMaintenance = async () => {
+        setLoadingMaintenance(true);
+        try {
+            const response = await fetch('/api/admin/maintenance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled: !maintenance })
+            });
+            const data = await response.json();
+            if (data.success) {
+                setMaintenance(data.maintenance);
+            }
+        } catch (error) {
+            console.error('Error toggling maintenance:', error);
+        } finally {
+            setLoadingMaintenance(false);
         }
     };
 
@@ -94,6 +129,18 @@ export function Panel() {
                         className="bg-white border border-slate-200 p-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
                     >
                         <RefreshCw size={20} />
+                    </button>
+                    <button 
+                        onClick={handleToggleMaintenance}
+                        disabled={loadingMaintenance}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all shadow-sm ${
+                            maintenance 
+                                ? 'bg-amber-50 border-amber-200 text-amber-700' 
+                                : 'bg-white border-slate-200 text-slate-600'
+                        }`}
+                    >
+                        {loadingMaintenance ? <Loader2 size={18} className="animate-spin" /> : (maintenance ? <ToggleRight size={20} /> : <ToggleLeft size={20} />)}
+                        <span className="font-bold text-sm">{maintenance ? 'MODO MANUTENÇÃO: ON' : 'MODO MANUTENÇÃO: OFF'}</span>
                     </button>
                 </div>
 
@@ -181,6 +228,12 @@ export function Panel() {
                     {/* Navigation Actions */}
                     <div className="space-y-4">
                         <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Ações do Sistema</h4>
+                        <NavAction 
+                            icon={<Settings className="text-blue-500" />} 
+                            title="Gerenciar Rifas" 
+                            desc="Criar, editar e finalizar sorteios"
+                            onClick={() => route('/admin/raffles')}
+                        />
                         <NavAction 
                             icon={<Users className="text-blue-500" />} 
                             title="Lista de Clientes" 

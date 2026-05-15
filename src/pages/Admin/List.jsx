@@ -5,10 +5,11 @@ import {
     Search, 
     CheckCircle2, 
     Clock, 
-    CreditCard, 
     User,
     RefreshCw,
-    Download
+    Download,
+    Hash,
+    MessageCircle
 } from 'lucide-preact';
 import '@styles';
 
@@ -16,6 +17,7 @@ export function List() {
     const { route } = useLocation();
     const [clients, setClients] = useState([]);
     const [filter, setFilter] = useState('');
+    const [syncing, setSyncing] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !sessionStorage.getItem('admin')) {
@@ -26,13 +28,20 @@ export function List() {
     }, []);
 
     const fetchClients = async () => {
+        setSyncing(true);
         try {
             const response = await fetch('/api/admin/clients');
             const data = await response.json();
             setClients(data);
         } catch (error) {
             console.error('Error fetching clients:', error);
+        } finally {
+            setSyncing(false);
         }
+    };
+
+    const handleExportCSV = () => {
+        window.open('/api/admin/clients/export', '_blank');
     };
 
     const handleConfirmPayment = async (id) => {
@@ -74,14 +83,19 @@ export function List() {
                     </div>
                     
                     <div className="flex gap-3">
-                        <button className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+                        <button 
+                            onClick={handleExportCSV}
+                            className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
+                        >
                             <Download size={18} /> Exportar CSV
                         </button>
                         <button 
                             onClick={fetchClients}
-                            className="bg-blue-600 px-4 py-2.5 rounded-xl text-white font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                            disabled={syncing}
+                            className="bg-blue-600 px-4 py-2.5 rounded-xl text-white font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
                         >
-                            <RefreshCw size={18} /> Sincronizar
+                            <RefreshCw size={18} className={syncing ? 'animate-spin' : ''} /> 
+                            {syncing ? 'Sincronizando...' : 'Sincronizar'}
                         </button>
                     </div>
                 </div>
@@ -103,50 +117,72 @@ export function List() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto overflow-y-auto max-h-[70vh] custom-scrollbar">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-slate-50 border-b border-slate-100 sticky top-0 z-10">
                                 <tr>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">ID / Data</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Participante</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Método</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Bilhetes</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Rifa ID</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Valor</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">WhatsApp</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {filteredClients.map(client => (
                                     <tr key={client.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4">
-                                            <p className="font-mono text-xs text-slate-400">#{client.id.toString().padStart(5, '0')}</p>
-                                            <p className="text-[10px] font-bold text-slate-500 mt-0.5">{new Date(client.createdAt).toLocaleDateString()}</p>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-slate-900">{client.name}</span>
+                                                <span className="text-xs text-slate-400">{client.email}</span>
+                                                <span className="text-[10px] font-mono text-slate-400">#{client.id.toString().padStart(5, '0')} • {new Date(client.createdAt).toLocaleDateString()}</span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-bold text-slate-900">{client.name}</p>
-                                            <p className="text-xs text-slate-400">{client.email} • {client.phone}</p>
+                                        <td className="px-6 py-4 text-center">
+                                            <span className="bg-slate-100 px-3 py-1 rounded-lg font-black text-slate-600 text-xs">
+                                                {client.units}
+                                            </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-black text-slate-900">
+                                        <td className="px-6 py-4 text-center font-mono text-xs text-blue-600 font-bold">
+                                            {client.raffleId ? `#${client.raffleId}` : '-'}
+                                        </td>
+                                        <td className="px-6 py-4 text-right font-black text-slate-900 whitespace-nowrap">
                                             R$ {client.amount.toFixed(2)}
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             {client.paid ? (
                                                 <div className="flex items-center justify-center gap-1.5 text-emerald-600">
-                                                    <CheckCircle2 size={16} />
-                                                    <span className="font-bold text-xs uppercase tracking-wider">Pago</span>
+                                                    <CheckCircle2 size={18} />
+                                                    <span className="font-bold text-[10px] uppercase tracking-wider">Pago</span>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center justify-center gap-1.5 text-amber-500">
-                                                    <Clock size={16} />
-                                                    <span className="font-bold text-xs uppercase tracking-wider">Aguardando PIX</span>
+                                                <div 
+                                                    className="flex items-center justify-center gap-1.5 text-amber-500 cursor-pointer group"
+                                                    onClick={() => handleConfirmPayment(client.id)}
+                                                    title="Clique para confirmar pagamento"
+                                                >
+                                                    <Clock size={18} className="group-hover:scale-110 transition-transform" />
+                                                    <span className="font-bold text-[10px] uppercase tracking-wider group-hover:underline">Pendente</span>
                                                 </div>
                                             )}
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <a 
+                                                href={`https://wa.me/55${client.phone.replace(/\D/g, '')}`} 
+                                                target="_blank" 
+                                                className="bg-emerald-500 text-white p-2 rounded-xl hover:bg-emerald-600 transition-all shadow-md shadow-emerald-200 inline-flex"
+                                                title="Falar no WhatsApp"
+                                            >
+                                                <MessageCircle size={16} />
+                                            </a>
                                         </td>
                                     </tr>
                                 ))}
                                 {filteredClients.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-slate-400 italic">
-                                            Nenhum cliente encontrado para os critérios de busca.
+                                        <td colSpan="6" className="px-6 py-12 text-center text-slate-400 italic font-medium">
+                                            Nenhum participante encontrado.
                                         </td>
                                     </tr>
                                 )}

@@ -10,6 +10,12 @@ export const register = async (req, res) => {
         const amount = parseFloat(units) * 5;
         const tickets = await generateTickets(parseInt(units));
         
+        // Find current active raffle
+        const activeRaffle = await prisma.raffle.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' }
+        });
+
         const client = await prisma.client.create({
             data: {
                 name,
@@ -18,7 +24,8 @@ export const register = async (req, res) => {
                 units: parseInt(units),
                 amount,
                 tickets,
-                paid: 0
+                paid: 0,
+                raffleId: activeRaffle ? activeRaffle.id : null
             }
         });
         console.log('Client saved with tickets:', client);
@@ -30,9 +37,59 @@ export const register = async (req, res) => {
     }
 };
 
+export const getFinishedRaffle = async (req, res) => {
+    try {
+        const raffle = await prisma.raffle.findFirst({
+            where: { status: 'FINISHED' },
+            orderBy: { drawDate: 'desc' },
+            include: { winner: true }
+        });
+        res.json(raffle);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const getAppState = async (req, res) => {
+    try {
+        const maintenance = await prisma.config.findUnique({
+            where: { key: 'maintenance_mode' }
+        });
+        
+        const activeRaffle = await prisma.raffle.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // Auto-assign clients without raffleId to the active raffle
+        if (activeRaffle) {
+            await prisma.client.updateMany({
+                where: { raffleId: null },
+                data: { raffleId: activeRaffle.id }
+            });
+        }
+
+        const lastFinished = await prisma.raffle.findFirst({
+            where: { status: 'FINISHED' },
+            orderBy: { drawDate: 'desc' }
+        });
+
+        res.json({
+            maintenance: maintenance ? maintenance.value === 'true' : false,
+            hasActiveRaffle: !!activeRaffle,
+            hasFinishedRaffle: !!lastFinished
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export const getTimer = async (req, res) => {
     try {
-        const raffle = await prisma.raffle.findFirst();
+        const raffle = await prisma.raffle.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' }
+        });
         res.json(raffle);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -41,8 +98,18 @@ export const getTimer = async (req, res) => {
 
 export const getRaffleStatus = async (req, res) => {
     try {
+        const activeRaffle = await prisma.raffle.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const where = { paid: 1 };
+        if (activeRaffle) {
+            where.raffleId = activeRaffle.id;
+        }
+
         const clients = await prisma.client.findMany({
-            where: { paid: 1 },
+            where,
             select: {
                 email: true,
                 phone: true,
@@ -56,7 +123,7 @@ export const getRaffleStatus = async (req, res) => {
             _sum: {
                 units: true
             },
-            where: { paid: 1 }
+            where
         });
 
         const maskedClients = clients.map(c => {

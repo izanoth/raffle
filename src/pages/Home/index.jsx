@@ -23,20 +23,11 @@ import {
     Maximize2,
     MinusSquare,
     CalendarDays,
-    MessageCircle
+    MessageCircle,
+    Trophy
 } from 'lucide-preact';
 import '@styles';
 
-/**
- * DOCUMENTAÇÃO DE REGRAS DE NEGÓCIO:
- * 1. Data de Início Estática: 29 de Abril de 2026.
- * 2. Prazo Limite: 45 dias a partir do início.
- * 3. Meta de Bilhetes: 52 unidades.
- * 4. Lógica do Sorteio: O sorteio ocorre ao atingir 52 bilhetes OU 45 dias.
- * 5. Se a meta for batida antes dos 45 dias, o sistema continua aceitando bilhetes até o fim do prazo.
- */
-const START_DATE = new Date('2026-04-29T00:00:00');
-const RAFFLE_DURATION_DAYS = 45;
 const GOAL_TICKETS = 52;
 
 function SystemTimer() {
@@ -67,25 +58,32 @@ export function Home() {
     const [activeWindow, setActiveWindow] = useState('form'); // 'form', 'status'
     const [playfulContent, setPlayfulContent] = useState({ title: '', message: '' });
     const [raffleStatus, setRaffleStatus] = useState(null);
+    const [activeRaffle, setActiveRaffle] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
-    const [daysRemaining, setDaysRemaining] = useState(RAFFLE_DURATION_DAYS);
+    const [daysRemaining, setDaysRemaining] = useState(0);
 
     useEffect(() => {
-        // Cálculo do prazo restante
-        const calculateTime = () => {
-            const now = new Date();
-            const end = new Date(START_DATE);
-            end.setDate(end.getDate() + RAFFLE_DURATION_DAYS);
-            
-            const diffTime = end - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            setDaysRemaining(Math.max(0, diffDays));
-        };
-
-        calculateTime();
-        const timer = setInterval(calculateTime, 3600000); // Atualiza a cada hora
-        return () => clearInterval(timer);
+        fetchActiveRaffle();
+        fetchStatus();
     }, []);
+
+    const fetchActiveRaffle = async () => {
+        try {
+            const response = await fetch('/api/timer');
+            const data = await response.json();
+            setActiveRaffle(data);
+            
+            if (data && data.endDate) {
+                const now = new Date();
+                const end = new Date(data.endDate);
+                const diffTime = end - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                setDaysRemaining(Math.max(0, diffDays));
+            }
+        } catch (error) {
+            console.error('Error fetching raffle timer:', error);
+        }
+    };
 
     const fetchStatus = async () => {
         setLoadingStatus(true);
@@ -205,7 +203,7 @@ export function Home() {
                     </div>
                     
                     <div className="flex-grow text-center md:text-left">
-                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Rifa do Ivan</h1>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">{activeRaffle?.title || 'Rifa do Ivan'}</h1>
                         <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-2">
                             <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
                                 <Clock size={12} /> <SystemTimer />
@@ -219,14 +217,14 @@ export function Home() {
                     <div className="flex flex-col gap-2">
                         <button 
                             onClick={openStatus}
-                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+                            className="flex items-center justify-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
                         >
                             <BarChart3 size={16} />
                             Status
                         </button>
                         <button 
                             onClick={() => setModal('contact')}
-                            className="flex items-center gap-2 bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors border border-slate-200 shadow-sm"
+                            className="flex items-center justify-center gap-2 bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors border border-slate-200 shadow-sm"
                         >
                             <MessageCircle size={16} />
                             Contato
@@ -255,7 +253,7 @@ export function Home() {
                                     <Info size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-bold text-blue-900">Prêmio: 50% do Arrecadado</h4>
+                                    <h4 className="text-sm font-bold text-blue-900">Prêmio: {activeRaffle?.prize || 'Carregando...'}</h4>
                                     <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
                                         Garanta sua chance e ajude-me nos estudos. <a href="#" onClick={openRules} className="underline font-bold">Ver regras</a>.
                                     </p>

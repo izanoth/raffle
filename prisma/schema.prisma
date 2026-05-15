@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RaffleStatus {
+  ACTIVE
+  FINISHED
+  CANCELLED
+}
+
 model Client {
   id        Int      @id @default(autoincrement())
   name      String
@@ -21,18 +27,39 @@ model Client {
   paid      Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  raffleId  Int?
+  raffle    Raffle?  @relation("RaffleClients", fields: [raffleId], references: [id])
+  wonRaffle Raffle?  @relation("RaffleWinner")
 
   @@map("clients")
 }
 
 model Raffle {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
+  number    String?      @unique // Identificador do sorteio
   title     String?
+  prize     String?      // Descrição detalhada do prêmio
+  status    RaffleStatus @default(ACTIVE)
+  winnerId  Int?         @unique
+  winner    Client?      @relation("RaffleWinner", fields: [winnerId], references: [id])
   endDate   DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  drawDate  DateTime?
+  videoUrl  String?
+  metadata  Json?
+  clients   Client[]     @relation("RaffleClients")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@map("raffle")
+}
+
+model Config {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+
+  @@map("configs")
 }
 
 model Session {
