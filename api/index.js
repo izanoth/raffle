@@ -4,6 +4,7 @@ import cors from 'cors';
 import prisma from './db.js';
 import * as mainController from './controllers/mainController.js';
 import * as asaasController from './controllers/asaasController.js';
+import * as contactController from './controllers/contactController.js';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.post('/api/register', mainController.register);
 app.get('/api/timer', mainController.getTimer);
 app.get('/api/raffle/status', mainController.getRaffleStatus);
+app.post('/api/contact', contactController.sendContact);
 
 // Asaas/PIX Routes
 app.post('/api/asaas', asaasController.asyncAsaas);

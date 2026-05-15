@@ -1,6 +1,6 @@
 import { Bike, MessageCircle, ChevronRight } from 'lucide-preact';
 
-export function Intro({ onClose }) {
+export function Intro({ onClose, onOpenContact }) {
     return (
         <div className="flex flex-col max-h-[80vh]">
             <div className="flex-grow overflow-y-auto px-6 py-8 custom-scrollbar">
@@ -24,15 +24,19 @@ export function Intro({ onClose }) {
                         Se fizer sentido pra você, fique à vontade para participar.
                     </p>
                     
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 mt-6 flex items-center gap-3">
-                        <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <button 
+                        onClick={onOpenContact}
+                        className="w-full bg-slate-50 p-4 rounded-2xl border border-slate-100 mt-6 flex items-center gap-3 hover:bg-slate-100 transition-colors text-left group"
+                    >
+                        <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                             <MessageCircle size={20} />
                         </div>
-                        <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qualquer dúvida, pode me chamar:</p>
-                            <p className="font-bold text-slate-900">(13) 98180-9361</p>
+                        <div className="flex-grow">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dúvidas ou suporte?</p>
+                            <p className="font-bold text-slate-900">Mande uma mensagem</p>
                         </div>
-                    </div>
+                        <ChevronRight size={18} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
+                    </button>
 
                     <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest pt-4">
                         Obrigado pela atenção 🙏

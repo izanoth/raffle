@@ -5,6 +5,7 @@ import { Intro } from './components/Intro';
 import { Contract } from './components/Contract';
 import { Rules } from './components/Rules';
 import { Playful } from './components/Playful';
+import { ContactModal } from './components/ContactModal';
 import { 
     Ticket, 
     User, 
@@ -21,7 +22,8 @@ import {
     X,
     Maximize2,
     MinusSquare,
-    CalendarDays
+    CalendarDays,
+    MessageCircle
 } from 'lucide-preact';
 import '@styles';
 
@@ -214,13 +216,22 @@ export function Home() {
                         </div>
                     </div>
 
-                    <button 
-                        onClick={openStatus}
-                        className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
-                    >
-                        <BarChart3 size={16} />
-                        Status
-                    </button>
+                    <div className="flex flex-col gap-2">
+                        <button 
+                            onClick={openStatus}
+                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+                        >
+                            <BarChart3 size={16} />
+                            Status
+                        </button>
+                        <button 
+                            onClick={() => setModal('contact')}
+                            className="flex items-center gap-2 bg-white text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors border border-slate-200 shadow-sm"
+                        >
+                            <MessageCircle size={16} />
+                            Contato
+                        </button>
+                    </div>
                 </div>
 
                 {activeWindow === 'form' ? (
@@ -502,7 +513,8 @@ export function Home() {
                             <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
                                 {modal === 'intro' ? 'Sistema' : 
                                  modal === 'contract' ? 'Contrato' : 
-                                 modal === 'rules' ? 'Regras' : 'Aviso'}
+                                 modal === 'rules' ? 'Regras' : 
+                                 modal === 'contact' ? 'Fale Conosco' : 'Aviso'}
                             </span>
                             <button onClick={() => setModal(null)} className="w-8 h-8 rounded-full hover:bg-slate-200 flex items-center justify-center text-slate-400 transition-colors">
                                 <X size={18} />
@@ -512,11 +524,13 @@ export function Home() {
                             {modal === 'playful' ? (
                                 <Playful content={playfulContent} onClose={() => setModal(null)} />
                             ) : modal === 'intro' ? (
-                                <Intro onClose={() => setModal(null)} />
+                                <Intro onClose={() => setModal(null)} onOpenContact={() => setModal('contact')} />
                             ) : modal === 'contract' ? (
                                 <Contract onClose={() => setModal(null)} />
                             ) : modal === 'rules' ? (
                                 <Rules onClose={() => setModal(null)} />
+                            ) : modal === 'contact' ? (
+                                <ContactModal onClose={() => setModal(null)} />
                             ) : null}
                         </div>
                     </div>
