@@ -180,7 +180,8 @@ export function Raffles() {
                     <div className="flex gap-3">
                         <button 
                             onClick={() => handleOpenModal()}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                            disabled={raffles.some(r => r.status === 'ACTIVE')}
+                            className={`${raffles.some(r => r.status === 'ACTIVE') ? 'bg-slate-300 cursor-not-allowed opacity-70' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'} text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg flex items-center gap-2`}
                         >
                             <Plus size={20} /> Nova Rifa
                         </button>
