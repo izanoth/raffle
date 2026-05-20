@@ -6,6 +6,7 @@ import * as mainController from './controllers/mainController.js';
 import * as asaasController from './controllers/asaasController.js';
 import * as contactController from './controllers/contactController.js';
 import * as adminController from './controllers/adminController.js';
+import * as pushController from './controllers/pushController.js';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -50,6 +51,10 @@ app.get('/api/app-state', mainController.getAppState);
 app.get('/api/raffle/status', mainController.getRaffleStatus);
 app.get('/api/raffle/finished', mainController.getFinishedRaffle);
 app.post('/api/contact', contactController.sendContact);
+
+// Push Notifications
+app.post('/api/push/subscribe', pushController.subscribe);
+app.post('/api/push/test', pushController.sendReminder);
 
 // Asaas/PIX Routes
 app.post('/api/asaas', asaasController.asyncAsaas);

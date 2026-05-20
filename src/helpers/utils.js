@@ -55,3 +55,49 @@ export function maskPhone(value) {
         .replace(/(\d{5})(\d)/, "$1-$2")
         .replace(/(-\d{4})\d+?$/, "$1");
 }
+
+export async function registerPush(email = null) {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        let subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription) {
+            const publicKey = 'BObBw4dnXBi2hyVyLXLHiULwJtsnVG2cRaGQLRBUkdsOCYAKa8QBTR1wfNFDo_uRXAI2qF-DkkLp_C1ko8XfSUQ';
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+            });
+        }
+
+        await saveSubscription(subscription, email);
+    } catch (error) {
+        console.error('Push registration failed:', error);
+    }
+}
+
+async function saveSubscription(subscription, email) {
+    await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription, email })
+    });
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}

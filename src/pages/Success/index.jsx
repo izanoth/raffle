@@ -165,7 +165,7 @@ export function Success() {
                                 <CheckCircle2 size={14} /> Participação Confirmada
                             </div>
                             <p className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-loose">
-                                Guarde este comprovante.<br/>O sorteio será realizado via Instagram.
+                                Guarde este comprovante.
                             </p>
                         </div>
                     </div>

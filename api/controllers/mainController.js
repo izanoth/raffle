@@ -30,6 +30,16 @@ export const register = async (req, res) => {
         });
         console.log('Client saved with tickets:', client);
 
+        // Mark push subscription as participated
+        try {
+            await prisma.pushSubscription.updateMany({
+                where: { email: email },
+                data: { participated: true }
+            });
+        } catch (pushErr) {
+            console.error('Error updating push subscription status:', pushErr);
+        }
+
         res.status(201).json(client);
     } catch (error) {
         console.error('Registration error:', error);

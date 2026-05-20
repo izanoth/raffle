@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
-import { maskPhone } from '../../helpers/utils';
+import { maskPhone, registerPush } from '../../helpers/utils';
 import { Intro } from './components/Intro';
 import { Contract } from './components/Contract';
 import { Rules } from './components/Rules';
@@ -24,7 +24,8 @@ import {
     MinusSquare,
     CalendarDays,
     MessageCircle,
-    Trophy
+    Trophy,
+    Bell
 } from 'lucide-preact';
 import '@styles';
 
@@ -61,11 +62,34 @@ export function Home() {
     const [activeRaffle, setActiveRaffle] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
     const [daysRemaining, setDaysRemaining] = useState(0);
+    const [showPushPrompt, setShowPushPrompt] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
     useEffect(() => {
         fetchActiveRaffle();
         fetchStatus();
+
+        // Show push prompt after 3 seconds if permission not granted
+        const timer = setTimeout(() => {
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+                setShowPushPrompt(true);
+            }
+        }, 3000);
+        return () => clearTimeout(timer);
     }, []);
+
+    const closeBanner = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setShowPushPrompt(false);
+            setIsClosing(false);
+        }, 400);
+    };
+
+    const handleAcceptPush = async () => {
+        closeBanner();
+        await registerPush(formData.email);
+    };
 
     const fetchActiveRaffle = async () => {
         try {
@@ -193,6 +217,25 @@ export function Home() {
 
     return (
         <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
+            {/* Push Notification Banner */}
+            {showPushPrompt && (
+                <div className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[2000] ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
+                    <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-700 ring-1 ring-white/10">
+                        <div className="bg-blue-600 p-2 rounded-xl">
+                            <Bell size={20} />
+                        </div>
+                        <div className="flex-grow">
+                            <p className="text-xs font-bold">Quer que eu te lembre do sorteio?</p>
+                            <p className="text-[10px] text-slate-400">Eu te aviso quando estiver perto de acabar!</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={closeBanner} className="text-[10px] font-bold px-3 py-2 hover:bg-white/10 rounded-lg transition-colors">Agora não</button>
+                            <button onClick={handleAcceptPush} className="text-[10px] font-bold bg-white text-slate-900 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors">Ativar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Main Container */}
             <div className="w-full max-w-xl animate-fade-in">
                 
