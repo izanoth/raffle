@@ -79,6 +79,31 @@ export async function registerPush(email = null) {
     }
 }
 
+export async function unregisterPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+
+        if (subscription) {
+            // Remove do banco antes de cancelar no browser para ter o endpoint
+            await fetch('/api/push/unsubscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ endpoint: subscription.endpoint })
+            });
+            
+            await subscription.unsubscribe();
+            console.log('Unsubscribed successfully');
+        }
+    } catch (error) {
+        console.error('Push unregistration failed:', error);
+    }
+}
+
 async function saveSubscription(subscription, email) {
     await fetch('/api/push/subscribe', {
         method: 'POST',

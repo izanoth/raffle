@@ -14,6 +14,8 @@ webpush.setVapidDetails(
 
 export const subscribe = async (req, res) => {
     const { subscription, email } = req.body;
+    const userAgent = req.headers['user-agent'];
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
         await prisma.pushSubscription.upsert({
@@ -21,14 +23,18 @@ export const subscribe = async (req, res) => {
             update: {
                 p256dh: subscription.keys.p256dh,
                 auth: subscription.keys.auth,
-                email: email || null
+                email: email || null,
+                userAgent,
+                ip
             },
             create: {
                 endpoint: subscription.endpoint,
                 p256dh: subscription.keys.p256dh,
                 auth: subscription.keys.auth,
                 email: email || null,
-                participated: false
+                participated: false,
+                userAgent,
+                ip
             }
         });
 
@@ -36,6 +42,30 @@ export const subscribe = async (req, res) => {
     } catch (error) {
         console.error('Push subscription error:', error);
         res.status(500).json({ error: 'Failed to subscribe' });
+    }
+};
+
+export const unsubscribe = async (req, res) => {
+    const { endpoint } = req.body;
+    try {
+        await prisma.pushSubscription.deleteMany({
+            where: { endpoint }
+        });
+        res.json({ message: 'Unsubscribed successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to unsubscribe' });
+    }
+};
+
+export const getSubscriptions = async (req, res) => {
+    try {
+        const subscriptions = await prisma.pushSubscription.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(subscriptions);
+    } catch (error) {
+        console.error('Error fetching subscriptions:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -82,6 +112,8 @@ export const broadcast = async (req, res) => {
         const where = {};
         if (filter === 'non-participated') {
             where.participated = false;
+        } else if (filter === 'participated') {
+            where.participated = true;
         }
 
         const subscriptions = await prisma.pushSubscription.findMany({ where });

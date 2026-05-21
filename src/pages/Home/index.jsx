@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useLocation } from 'preact-iso';
-import { maskPhone, registerPush } from '../../helpers/utils';
+import { maskPhone, registerPush, unregisterPush } from '../../helpers/utils';
 import { Intro } from './components/Intro';
 import { Contract } from './components/Contract';
 import { Rules } from './components/Rules';
@@ -12,6 +12,7 @@ import {
     Mail, 
     Phone, 
     ChevronRight, 
+    ChevronDown,
     Info, 
     BarChart3, 
     RefreshCw, 
@@ -62,33 +63,50 @@ export function Home() {
     const [activeRaffle, setActiveRaffle] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(false);
     const [daysRemaining, setDaysRemaining] = useState(0);
-    const [showPushPrompt, setShowPushPrompt] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isPushActive, setIsPushActive] = useState(false);
+    const [isPushExpanded, setIsPushExpanded] = useState(false);
 
     useEffect(() => {
         fetchActiveRaffle();
         fetchStatus();
 
-        // Show push prompt after 3 seconds if permission not granted
-        const timer = setTimeout(() => {
-            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
-                setShowPushPrompt(true);
+        // Check current notification status
+        if (typeof window !== 'undefined' && 'Notification' in window) {
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.pushManager.getSubscription().then(sub => {
+                        setIsPushActive(!!sub);
+                    });
+                });
             }
-        }, 3000);
-        return () => clearTimeout(timer);
-    }, []);
+        }
 
-    const closeBanner = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            setShowPushPrompt(false);
-            setIsClosing(false);
-        }, 400);
-    };
+        // Auto-expand push notification after reading intro if Intro modal is open
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('hasAutoExpandedPush')) {
+            const introModalIsActive = modal === 'intro';
+            if (introModalIsActive) {
+                const timer = setTimeout(() => {
+                    setIsPushExpanded(true);
+                    sessionStorage.setItem('hasAutoExpandedPush', 'true');
+                }, 30000); // 30 seconds estimated read time for Intro.jsx
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [modal]); // Changed dependency array to include modal
 
-    const handleAcceptPush = async () => {
-        closeBanner();
-        await registerPush(formData.email);
+    const handleTogglePush = async () => {
+        if (isPushActive) {
+            await unregisterPush();
+            setIsPushActive(false);
+        } else {
+            // Se as permissões já foram negadas no browser, alertar o usuário
+            if (Notification.permission === 'denied') {
+                alert('⚠️ As notificações foram bloqueadas no seu navegador. Você precisa ativá-las nas configurações do site para receber os lembretes.');
+                return;
+            }
+            await registerPush(formData.email);
+            setIsPushActive(true);
+        }
     };
 
     const fetchActiveRaffle = async () => {
@@ -217,24 +235,54 @@ export function Home() {
 
     return (
         <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
-            {/* Push Notification Banner */}
-            {showPushPrompt && (
-                <div className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[2000] ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
-                    <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-700 ring-1 ring-white/10">
-                        <div className="bg-blue-600 p-2 rounded-xl">
-                            <Bell size={20} />
-                        </div>
-                        <div className="flex-grow">
-                            <p className="text-xs font-bold">Quer que eu te lembre do sorteio?</p>
-                            <p className="text-[10px] text-slate-400">Eu te aviso quando estiver perto de acabar!</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <button onClick={closeBanner} className="text-[10px] font-bold px-3 py-2 hover:bg-white/10 rounded-lg transition-colors">Agora não</button>
-                            <button onClick={handleAcceptPush} className="text-[10px] font-bold bg-white text-slate-900 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors">Ativar</button>
-                        </div>
-                    </div>
+            {/* Fixed Push Notification Toggle (Top Right) */}
+            <div className={`fixed top-4 right-4 z-[2000] rounded-2xl overflow-hidden transition-all
+    ${isPushExpanded ? 'max-w-sm duration-500' : 'max-w-[48px] h-12 duration-200'}
+    ${isPushExpanded ? 'bg-white border border-slate-200 shadow-lg' : ''}
+`}>
+    <div className="flex flex-col">
+        <div
+            className={`relative p-3 rounded-2xl flex items-center transition-colors duration-300 cursor-pointer
+            ${isPushExpanded ? 'justify-start bg-slate-50' : 'justify-center'}
+            ${!isPushExpanded && (isPushActive ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-slate-900')}
+            `}
+            onClick={() => setIsPushExpanded(!isPushExpanded)}
+        >
+            <Bell size={24} className={!isPushExpanded && !isPushActive ? 'animate-ring' : ''} />
+            {isPushExpanded && (
+                <div className="flex-1 flex flex-col ml-3 min-w-[150px]">
+                    <p className="text-xs font-black uppercase tracking-tight text-slate-900">
+                        Quer que eu te lembre das Novidades?
+                    </p>
+                    <p className="text-[10px] font-bold leading-tight text-slate-500">
+                        Eu te aviso quando estiver perto de acabar ou novos sorteios tiverem data!
+                    </p>
                 </div>
             )}
+        </div>
+
+        {isPushExpanded && (
+            <div className="p-3 bg-white border-t border-slate-100 flex items-center justify-between">
+                <span className={`text-[10px] font-bold uppercase ${isPushActive ? 'text-emerald-700' : 'text-slate-500'}`}>
+                    {isPushActive ? 'Notificações Ativas' : 'Desativado'}
+                </span>
+                <button
+                    type="button"
+                    onClick={handleTogglePush}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${
+                        isPushActive ? 'bg-emerald-600' : 'bg-slate-300'
+                    }`}
+                >
+                    <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            isPushActive ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                    />
+                </button>
+            </div>
+        )}
+    </div>
+</div>
 
             {/* Main Container */}
             <div className="w-full max-w-xl animate-fade-in">

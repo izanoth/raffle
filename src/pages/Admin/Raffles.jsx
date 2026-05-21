@@ -4,7 +4,6 @@ import {
     ChevronLeft, 
     Plus, 
     Edit2, 
-    Trash2, 
     Trophy, 
     CheckCircle2, 
     XCircle,
@@ -104,16 +103,6 @@ export function Raffles() {
             }
         } catch (error) {
             console.error('Error saving raffle:', error);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        if (!confirm('Deseja realmente excluir esta rifa? Esta ação não pode ser desfeita.')) return;
-        try {
-            const response = await fetch(`/api/admin/raffles/${id}`, { method: 'DELETE' });
-            if (response.ok) fetchRaffles();
-        } catch (error) {
-            console.error('Error deleting raffle:', error);
         }
     };
 
@@ -241,18 +230,12 @@ export function Raffles() {
                                         )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 gap-3">
                                         <button 
                                             onClick={() => handleOpenModal(raffle)}
                                             className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm"
                                         >
-                                            <Edit2 size={16} /> Editar
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(raffle.id)}
-                                            className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 transition-all font-bold text-sm"
-                                        >
-                                            <Trash2 size={16} /> Excluir
+                                            <Edit2 size={16} /> Editar Rifa
                                         </button>
                                     </div>
                                     

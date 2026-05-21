@@ -114,15 +114,7 @@ export const updateRaffle = async (req, res) => {
 };
 
 export const deleteRaffle = async (req, res) => {
-    const { id } = req.params;
-    try {
-        await prisma.raffle.delete({
-            where: { id: parseInt(id) }
-        });
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    return res.status(403).json({ error: 'Exclusão de rifas não é permitida. Elas devem permanecer registradas para histórico.' });
 };
 
 export const drawRaffle = async (req, res) => {

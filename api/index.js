@@ -52,10 +52,14 @@ app.get('/api/raffle/status', mainController.getRaffleStatus);
 app.get('/api/raffle/finished', mainController.getFinishedRaffle);
 app.post('/api/contact', contactController.sendContact);
 
-// Push Notifications
+// Push Notifications (Public)
 app.post('/api/push/subscribe', pushController.subscribe);
-app.post('/api/push/test', pushController.sendReminder);
-app.post('/api/push/broadcast', pushController.broadcast);
+app.post('/api/push/unsubscribe', pushController.unsubscribe);
+
+// Push Notifications (Admin)
+app.get('/api/admin/push/subscriptions', pushController.getSubscriptions);
+app.post('/api/admin/push/broadcast', pushController.broadcast);
+app.post('/api/admin/push/test', pushController.sendReminder);
 
 // Asaas/PIX Routes
 app.post('/api/asaas', asaasController.asyncAsaas);
