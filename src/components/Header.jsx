@@ -27,7 +27,6 @@ export function Header() {
     const navItems = [
         { label: 'Painel', path: '/admin/panel', icon: <LayoutDashboard size={18} /> },
         { label: 'Clientes', path: '/admin/list', icon: <Users size={18} /> },
-        { label: 'Hasher', path: '/admin/hasher', icon: <Hash size={18} /> },
     ];
 
     return (

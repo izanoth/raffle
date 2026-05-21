@@ -55,6 +55,7 @@ app.post('/api/contact', contactController.sendContact);
 // Push Notifications
 app.post('/api/push/subscribe', pushController.subscribe);
 app.post('/api/push/test', pushController.sendReminder);
+app.post('/api/push/broadcast', pushController.broadcast);
 
 // Asaas/PIX Routes
 app.post('/api/asaas', asaasController.asyncAsaas);

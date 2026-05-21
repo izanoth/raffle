@@ -14,7 +14,8 @@ import {
     RefreshCw,
     Settings,
     ToggleLeft,
-    ToggleRight
+    ToggleRight,
+    Bell
 } from 'lucide-preact';
 import '@styles';
 
@@ -239,6 +240,12 @@ export function Panel() {
                             title="Lista de Clientes" 
                             desc="Ver todos os participantes e pagamentos"
                             onClick={() => route('/admin/list')}
+                        />
+                        <NavAction 
+                            icon={<Bell className="text-amber-500" />} 
+                            title="Notificações Push" 
+                            desc="Enviar avisos e lembretes aos inscritos"
+                            onClick={() => route('/admin/push')}
                         />
                         <NavAction 
                             icon={<Hash className="text-indigo-500" />} 

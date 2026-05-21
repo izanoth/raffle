@@ -74,3 +74,43 @@ export const sendReminder = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const broadcast = async (req, res) => {
+    const { title, body, filter } = req.body;
+
+    try {
+        const where = {};
+        if (filter === 'non-participated') {
+            where.participated = false;
+        }
+
+        const subscriptions = await prisma.pushSubscription.findMany({ where });
+
+        const notifications = subscriptions.map(sub => {
+            const pushConfig = {
+                endpoint: sub.endpoint,
+                keys: {
+                    auth: sub.auth,
+                    p256dh: sub.p256dh
+                }
+            };
+
+            return webpush.sendNotification(pushConfig, JSON.stringify({
+                title: title || 'Rifa do Ivan',
+                body: body || 'Olá! Temos novidades no sorteio.',
+                url: '/'
+            })).catch(err => {
+                if (err.statusCode === 410) {
+                    return prisma.pushSubscription.delete({ where: { id: sub.id } });
+                }
+                console.error('Error sending broadcast push:', err);
+            });
+        });
+
+        await Promise.all(notifications);
+        res.json({ success: true, count: subscriptions.length });
+    } catch (error) {
+        console.error('Broadcast error:', error);
+        res.status(500).json({ error: 'Failed to send broadcast' });
+    }
+};

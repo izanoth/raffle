@@ -11,6 +11,7 @@ import { Hasher } from './pages/Admin/Hasher.jsx';
 import { List } from './pages/Admin/List.jsx';
 import { SuccessPreview } from './pages/Admin/SuccessPreview.jsx';
 import { Raffles } from './pages/Admin/Raffles.jsx';
+import { Push } from './pages/Admin/Push.jsx';
 import { Maintenance } from './pages/Maintenance.jsx';
 import { Finished } from './pages/Finished.jsx';
 import { NotFound } from './pages/_404.jsx';
@@ -82,6 +83,7 @@ export function App() {
 					<Route path="/admin/list" component={List} />
 					<Route path="/admin/success-preview" component={SuccessPreview} />
 					<Route path="/admin/raffles" component={Raffles} />
+					<Route path="/admin/push" component={Push} />
 					<Route default component={NotFound} />
 				</Router>
 			</main>
