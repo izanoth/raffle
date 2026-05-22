@@ -72,13 +72,11 @@ export function Home() {
 
         // Check current notification status
         if (typeof window !== 'undefined' && 'Notification' in window) {
-            if (Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(reg => {
-                    reg.pushManager.getSubscription().then(sub => {
-                        setIsPushActive(!!sub);
-                    });
+            navigator.serviceWorker.ready.then(reg => {
+                reg.pushManager.getSubscription().then(sub => {
+                    setIsPushActive(!!sub);
                 });
-            }
+            });
         }
 
         // Auto-expand push notification after reading intro if Intro modal is open
@@ -107,8 +105,10 @@ export function Home() {
                 alert('⚠️ As notificações foram bloqueadas no seu navegador. Você precisa ativá-las nas configurações do site para receber os lembretes.');
                 return;
             }
-            await registerPush(formData.email);
-            setIsPushActive(true);
+            const success = await registerPush(formData.email);
+            if (success) {
+                setIsPushActive(true);
+            }
         }
     };
 

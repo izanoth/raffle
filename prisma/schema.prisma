@@ -25,6 +25,8 @@ model Client {
   units     Int      @default(1)
   amount    Float
   paid      Int      @default(0)
+  ip        String?
+  userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   

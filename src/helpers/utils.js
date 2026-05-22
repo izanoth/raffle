@@ -58,7 +58,7 @@ export function maskPhone(value) {
 
 export async function registerPush(email = null) {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        return;
+        return null;
     }
 
     try {
@@ -73,9 +73,14 @@ export async function registerPush(email = null) {
             });
         }
 
-        await saveSubscription(subscription, email);
+        if (subscription) {
+            await saveSubscription(subscription, email);
+            return subscription;
+        }
+        return null;
     } catch (error) {
         console.error('Push registration failed:', error);
+        return null;
     }
 }
 
