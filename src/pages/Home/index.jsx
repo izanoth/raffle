@@ -65,10 +65,17 @@ export function Home() {
     const [daysRemaining, setDaysRemaining] = useState(0);
     const [isPushActive, setIsPushActive] = useState(false);
     const [isPushExpanded, setIsPushExpanded] = useState(false);
+    const [hasParticipated, setHasParticipated] = useState(false);
 
     useEffect(() => {
         fetchActiveRaffle();
         fetchStatus();
+
+        // Check if user has already participated
+        if (typeof window !== 'undefined') {
+            const client = sessionStorage.getItem('new-client');
+            if (client) setHasParticipated(true);
+        }
 
         // Check current notification status
         if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -247,18 +254,24 @@ export function Home() {
         <div
             className={`relative p-3 rounded-2xl flex items-center transition-colors duration-300 cursor-pointer
             ${isPushExpanded ? 'justify-start bg-slate-50' : 'justify-center'}
-            ${!isPushExpanded && (isPushActive ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-slate-900')}
+            ${!isPushExpanded && (hasParticipated ? 'bg-emerald-500 text-white' : (isPushActive ? 'bg-blue-600 text-white' : 'bg-amber-400 text-slate-900'))}
             `}
             onClick={() => setIsPushExpanded(!isPushExpanded)}
         >
-            <Bell size={24} className={!isPushExpanded && !isPushActive ? 'animate-ring' : ''} />
+            {hasParticipated ? (
+                <ShieldCheck size={24} />
+            ) : (
+                <Bell size={24} className={!isPushExpanded && !isPushActive ? 'animate-ring' : ''} />
+            )}
             {isPushExpanded && (
                 <div className="flex-1 flex flex-col ml-3 min-w-[150px]">
                     <p className="text-xs font-black uppercase tracking-tight text-slate-900">
-                        Quer que eu te lembre das Novidades?
+                        {hasParticipated ? 'Participação Garantida!' : 'Quer que eu te lembre das Novidades?'}
                     </p>
                     <p className="text-[10px] font-bold leading-tight text-slate-500">
-                        Eu te aviso quando estiver perto de acabar ou novos sorteios tiverem data!
+                        {hasParticipated 
+                            ? 'Você já está concorrendo. Avisaremos por aqui se houver novidades sobre o sorteio!' 
+                            : 'Eu te aviso quando estiver perto de acabar ou novos sorteios tiverem data!'}
                     </p>
                 </div>
             )}
@@ -266,14 +279,16 @@ export function Home() {
 
         {isPushExpanded && (
             <div className="p-3 bg-white border-t border-slate-100 flex items-center justify-between">
-                <span className={`text-[10px] font-bold uppercase ${isPushActive ? 'text-emerald-700' : 'text-slate-500'}`}>
-                    {isPushActive ? 'Notificações Ativas' : 'Desativado'}
+                <span className={`text-[10px] font-bold uppercase ${
+                    hasParticipated ? 'text-emerald-700' : (isPushActive ? 'text-blue-700' : 'text-slate-500')
+                }`}>
+                    {hasParticipated ? 'Sorteio Confirmado' : (isPushActive ? 'Notificações Ativas' : 'Lembretes Desativados')}
                 </span>
                 <button
                     type="button"
                     onClick={handleTogglePush}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${
-                        isPushActive ? 'bg-emerald-600' : 'bg-slate-300'
+                        isPushActive ? (hasParticipated ? 'bg-emerald-600' : 'bg-blue-600') : 'bg-slate-300'
                     }`}
                 >
                     <span
