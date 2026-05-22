@@ -82,17 +82,20 @@ export function Home() {
         }
 
         // Auto-expand push notification after reading intro if Intro modal is open
-        if (typeof window !== 'undefined' && !sessionStorage.getItem('hasAutoExpandedPush')) {
+        // Logic: Expand if NOT already active/subscribed. 
+        // We removed sessionStorage check to allow it to expand on subsequent visits if not registered.
+        if (typeof window !== 'undefined' && !isPushActive) {
             const introModalIsActive = modal === 'intro';
             if (introModalIsActive) {
                 const timer = setTimeout(() => {
-                    setIsPushExpanded(true);
-                    sessionStorage.setItem('hasAutoExpandedPush', 'true');
+                    if (!isPushActive) {
+                        setIsPushExpanded(true);
+                    }
                 }, 30000); // 30 seconds estimated read time for Intro.jsx
                 return () => clearTimeout(timer);
             }
         }
-    }, [modal]); // Changed dependency array to include modal
+    }, [modal, isPushActive]);
 
     const handleTogglePush = async () => {
         if (isPushActive) {
