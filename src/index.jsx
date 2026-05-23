@@ -1,5 +1,6 @@
 import { LocationProvider, Router, Route, hydrate, prerender as ssr } from 'preact-iso';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
@@ -88,6 +89,7 @@ export function App() {
 				</Router>
 			</main>
 			<Analytics />
+			<SpeedInsights />
 		</LocationProvider>
 	);
 }
